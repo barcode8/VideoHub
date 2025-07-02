@@ -15,7 +15,7 @@ const registerUser = asyncHandler(async (req,res)=>{
     //remove password and refresh token field from response
 
     //step 1
-    const {username, email, fullName, password }=req.body
+    const {username, email, fullName, password}=req.body
     
     if(
         [username, email, fullName, password].some((field)=>field?.trim()==="")
@@ -23,7 +23,7 @@ const registerUser = asyncHandler(async (req,res)=>{
         throw new ApiError(400, "All fields are required")
     }
 
-    const existingUser=User.findOne({
+    const existingUser=await User.findOne({
         $or: [{username} , {email}]
     })
 
@@ -32,7 +32,11 @@ const registerUser = asyncHandler(async (req,res)=>{
     }
 
     const avatarLocalPath=req.files?.avatar[0]?.path
-    const coverImageLocalPath=req.files?.coverImage[0]?.path
+
+    let coverImageLocalPath;
+    if(req.files.coverImage?.[0]){
+        coverImageLocalPath= req.files.coverImage[0].path
+    }
 
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar is compulsory")
