@@ -7,7 +7,7 @@ export default function Header() {
 
     return (
         <>
-            <div className="w-screen h-16 bg-black flex items-center justify-between px-4">
+            <div className="w-screen h-16 bg-black flex items-center justify-between px-4 font-roboto">
                 {/* Left: Logo */}
                 <div className="flex items-center">
                     <img

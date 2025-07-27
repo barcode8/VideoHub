@@ -4,12 +4,20 @@ import {createBrowserRouter, createRoutesFromElements, RouterProvider, Route} fr
 import Layout from './Layout.jsx'
 import Home from './components/Home/Home.jsx'
 import './App.css'
+import Login from './components/Login/Login.jsx'
+import Register from './components/Register/Register.jsx'
+import '@fontsource/roboto'; 
+
 import Header from './components/Header/Header.jsx'
 
 const router= createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<Layout />}>
-      <Route path='' element={<Home />}/>
+    <Route>
+      <Route path='/' element={<Layout />}>
+        <Route path='' element={<Home />}/>
+      </Route>
+      <Route path='/login' element={<Login />}/>
+      <Route path='/register' element={<Register />}/>
     </Route>
   )
 )
