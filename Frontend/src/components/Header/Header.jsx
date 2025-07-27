@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Header() {
     const [query, setQuery] = useState("");
@@ -57,13 +58,16 @@ export default function Header() {
                             Login
                         </motion.button>
 
-                        <motion.button
+                        <Link
+                        to="/register">
+                            <motion.button
                             className="bg-white text-black border-2 border-white py-1 px-3 rounded-full"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                        >
+                            >
                             Register
-                        </motion.button>
+                            </motion.button>
+                        </Link>
                     </div>
                 </div>
             </div>

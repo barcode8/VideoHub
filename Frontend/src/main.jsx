@@ -12,13 +12,13 @@ import Header from './components/Header/Header.jsx'
 
 const router= createBrowserRouter(
   createRoutesFromElements(
-    <Route>
-      <Route path='/' element={<Layout />}>
-        <Route path='' element={<Home />}/>
-      </Route>
+      <Route path='/'>
+        <Route element={<Layout />}>
+          <Route index element={<Home />}/>
+        </Route>
       <Route path='/login' element={<Login />}/>
       <Route path='/register' element={<Register />}/>
-    </Route>
+      </Route>
   )
 )
 
