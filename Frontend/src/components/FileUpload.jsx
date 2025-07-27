@@ -25,7 +25,7 @@ export default function FileUpload({
 
     return(
         <div className="text-white w-full max-w-md mx-auto font-roboto">
-            <label htmlFor={name}>
+            <label htmlFor={name} className="mb-2">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
 
@@ -38,7 +38,7 @@ export default function FileUpload({
 
             {!file ? (
                 <label htmlFor={name}
-                className="block w-full text-center bg-zinc-800 text-white py-2 rounded cursor-pointer hover:bg-zinc-700 transition">
+                className="block w-full text-center bg-zinc-800 text-white py-2 rounded cursor-pointer hover:bg-zinc-700 transition mb-4">
                     Choose File
                 </label>
             ):(

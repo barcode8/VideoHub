@@ -7,7 +7,7 @@ export default function Register() {
 
     return (
         <>
-            <div className="bg-black h-screen w-screen flex items-center justify-center font-roboto">
+            <div className="bg-black h-screen w-screen flex items-center justify-center font-roboto overflow-x-hidden overflow-y-hidden">
                 <motion.div
                     className="bg-zinc-900 w-auto h-auto rounded-2xl p-10 flex flex-col items-start justify-start content-between space-y-6"
                     initial={{ y: 50, opacity: 0 }}
@@ -18,44 +18,44 @@ export default function Register() {
                         Create An Account
                     </h1>
 
-                    <label htmlFor="username" className="text-white">
+                    <label htmlFor="username" className="text-white mb-2">
                         Username <span className="text-red-500">*</span>
                     </label>
 
                     <input
                         id="username"
                         type="text"
-                        className="bg-zinc-800 text-white placeholder-white rounded"
+                        className="bg-zinc-800 text-white placeholder-white rounded mb-4"
                     />
 
-                    <label htmlFor="email" className="text-white">
+                    <label htmlFor="email" className="text-white mb-2">
                         Email <span className="text-red-500">*</span>
                     </label>
 
                     <input
                         id="email"
                         type="text"
-                        className="bg-zinc-800 text-white placeholder-white rounded"
+                        className="bg-zinc-800 text-white placeholder-white rounded mb-4"
                     />
 
-                    <label htmlFor="fullname" className="text-white">
+                    <label htmlFor="fullname" className="text-white mb-2">
                         Full Name <span className="text-red-500">*</span>
                     </label>
 
                     <input
                         id="fullname"
                         type="text"
-                        className="bg-zinc-800 text-white placeholder-white rounded"
+                        className="bg-zinc-800 text-white placeholder-white rounded mb-4"
                     />
 
-                    <label htmlFor="password" className="text-white">
+                    <label htmlFor="password" className="text-white mb-2">
                         Password <span className="text-red-500">*</span>
                     </label>
 
                     <input
                         id="password"
                         type="password"
-                        className="bg-zinc-800 text-white placeholder-white rounded"
+                        className="bg-zinc-800 text-white placeholder-white rounded mb-4"
                     />
 
                     <FileUpload 
