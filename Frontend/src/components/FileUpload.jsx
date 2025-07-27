@@ -6,7 +6,7 @@ export default function FileUpload({
     name = "file",
     required = false,
     accept = "image/*",
-    onFileSelect = () => {},
+    onChange, 
 }) {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -16,18 +16,28 @@ export default function FileUpload({
         if (selectedFile) {
             setFile(selectedFile);
             setPreview(URL.createObjectURL(selectedFile));
-            onFileSelect(selectedFile); // callback to parent if needed
+            if (onChange) {
+                onChange(e); 
+            }
+        } else {
+            setFile(null);
+            setPreview(null);
+            if (onChange) {
+                onChange({ target: { name, files: [] } });
+            }
         }
     };
 
     const removeFile = () => {
         setFile(null);
         setPreview(null);
-        onFileSelect(null); // let parent know it's removed
+        if (onChange) {
+            onChange({ target: { name, files: [] } }); 
+        }
     };
 
     return (
-        <div className="text-white w-full max-w-md mx-auto">
+        <div className="text-white w-full max-w-md mx-auto font-roboto">
             <label htmlFor={name} className="block mb-2">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
@@ -35,6 +45,7 @@ export default function FileUpload({
             <input
                 id={name}
                 type="file"
+                name={name} 
                 accept={accept}
                 className="hidden"
                 onChange={handleFileChange}
