@@ -50,22 +50,25 @@ export default function Header() {
 
                     {/* Login / Register buttons */}
                     <div className="flex items-center space-x-3">
-                        <motion.button
-                            className="text-white border-2 border-white py-1 px-3 rounded-full"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Login
-                        </motion.button>
+                        <Link
+                            to='/login'>
+                            <motion.button
+                                className="text-white border-2 border-white py-1 px-3 rounded-full"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Login
+                            </motion.button>
+                        </Link>
 
                         <Link
-                        to="/register">
+                            to="/register">
                             <motion.button
-                            className="bg-white text-black border-2 border-white py-1 px-3 rounded-full"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
+                                className="bg-white text-black border-2 border-white py-1 px-3 rounded-full"
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                            Register
+                                Register
                             </motion.button>
                         </Link>
                     </div>
