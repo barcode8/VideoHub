@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
 import { useState, useMemo, useEffect } from "react";
 import { ClipLoader } from "react-spinners"
-import FileUpload from "../FileUpload";
+import FileUpload from "../../utils/FileUpload.jsx";
 import { useRegisterController } from "../../hooks/useRegisterController.js"
 import {useNavigate} from 'react-router-dom'
 
