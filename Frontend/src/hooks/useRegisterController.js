@@ -32,13 +32,12 @@ export const useRegisterController = () => {
         try {
             setLoading(true)
 
-            const res = await axios.post("http://localhost:5000/api/v1/users/register", data, {
+            const res = await axios.post("http://localhost:5000/api/v1/users/login", data, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 },
                 withCredentials: true
             })
-            console.log(res)
             setSuccess(true)
         } catch (error) {
             const trimmedError = {

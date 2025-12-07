@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRegisterController } from "../../hooks/useRegisterController.js";
 
 export default function Register() {
-    // 1. Logic Integration: Bring back the bubbles animation logic
     const bubbles = useMemo(() =>
         [...Array(15)].map(() => ({
             size: Math.random() * 60 + 20,
@@ -15,11 +14,9 @@ export default function Register() {
         })), []
     );
 
-    // 2. Logic Integration: Hook up the controller
     const { formData, handleChange, handleSubmit, loading, error, success } = useRegisterController();
     const navigate = useNavigate();
 
-    // 3. Logic Integration: Auto-redirect on success
     useEffect(() => {
         if (success) {
             const timer = setTimeout(() => {
@@ -69,7 +66,6 @@ export default function Register() {
                     ease: "easeOut"
                 }}
             >
-                {/* 4. Logic Integration: Conditional Rendering for Success State */}
                 {success ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-6">
                         <motion.svg
@@ -107,7 +103,7 @@ export default function Register() {
                             Create An Account
                         </h2>
 
-                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}> {/* Prevent default form submission */}
+                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                             <div>
                                 <label htmlFor="email" className="text-zinc-300 block mb-2 text-sm">
                                     Email <span className="text-purple-500">*</span>
@@ -153,7 +149,6 @@ export default function Register() {
                                 />
                             </div>
 
-                            {/* 5. Logic Integration: Error Message Display */}
                             {error && (
                                 <motion.p 
                                     initial={{ opacity: 0, y: -10 }}

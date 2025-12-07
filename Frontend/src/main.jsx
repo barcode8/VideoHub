@@ -7,8 +7,7 @@ import './App.css'
 import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
 import '@fontsource/roboto'; 
-
-import Header from './components/Header/Header.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 
 const router= createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +23,8 @@ const router= createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router}/>
+    <AuthProvider>
+      <RouterProvider router={router}/>
+    </AuthProvider>
   </StrictMode>,
 )

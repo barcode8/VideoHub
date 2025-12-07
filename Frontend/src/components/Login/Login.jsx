@@ -1,21 +1,11 @@
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useLoginController } from "../../hooks/useLoginController.js";
 
 export default function Login() {
-    // 1. Setup State: Made the form interactive instead of hardcoded consts
-    const [formData, setFormData] = useState({
-        username: "",
-        password: ""
-    });
-    
-    // Placeholder states for your future API hook integration
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(""); 
-    const [success, setSuccess] = useState(false);
 
-    // 2. Logic Integration: Bubbles background (updated to Purple for theme consistency)
     const bubbles = useMemo(() =>
         [...Array(15)].map(() => ({
             size: Math.random() * 60 + 20,
@@ -25,21 +15,18 @@ export default function Login() {
         })), []
     );
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-    };
+    const navigate = useNavigate()
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // TODO: Connect your login API call here
-        console.log("Logging in with:", formData);
-        setLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setLoading(false);
-            // setSuccess(true);
-        }, 2000);
-    };
+    const {formData, handleChange, handleSubmit, loading, error, success} = useLoginController()
+
+    useEffect(() => {
+            if (success) {
+                const timer = setTimeout(() => {
+                    navigate("/");
+                }, 2500);
+                return () => clearTimeout(timer);
+            }
+    }, [success, navigate]);
 
     return (
         <div className="bg-black h-screen w-screen flex items-center justify-center overflow-hidden relative font-roboto">
