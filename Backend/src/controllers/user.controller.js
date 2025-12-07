@@ -5,6 +5,9 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
+import dotenv from "dotenv";
+
+dotenv.config()
 
 const generateAccessAndRefreshTokens= async(userId)=>{
     try {
@@ -34,7 +37,7 @@ const registerUser = asyncHandler(async (req,res)=>{
     const {username, email, fullName, password}=req.body
     
     if(
-        [username, email, fullName, password].some((field)=>field?.trim()==="")
+        [username, email, password].some((field)=>field?.trim()==="")
     ){
         throw new ApiError(400, "All fields are required")
     }
@@ -46,29 +49,30 @@ const registerUser = asyncHandler(async (req,res)=>{
     if(existingUser){
         throw new ApiError(409,"User with email or username already exists")
     }
-    const avatarLocalPath=req.files?.avatar?.[0]?.path
+    const defaultAvatar=process.env.DEFAULT_AVATAR
+    const defaultCoverImage=process.env.DEFAULT_COVER_IMAGE
 
-    if(!avatarLocalPath){
-        throw new ApiError(400,"Avatar is compulsory")
-    }
+    // if(!avatarLocalPath){
+    //     throw new ApiError(400,"Avatar is compulsory")
+    // }
 
-    let coverImageLocalPath= req.files?.coverImage?.[0]?.path;
-    if(req.files.coverImage?.[0]){
-        coverImageLocalPath= req.files.coverImage[0].path
-    }
+    // let coverImageLocalPath= req.files?.coverImage?.[0]?.path;
+    // if(req.files.coverImage?.[0]){
+    //     coverImageLocalPath= req.files.coverImage[0].path
+    // }
 
-    const avatar=await uploadOnCloudinary(avatarLocalPath)
-    const coverImage=await uploadOnCloudinary(coverImageLocalPath)
+    // const avatar=await uploadOnCloudinary(avatarLocalPath)
+    // const coverImage=await uploadOnCloudinary(coverImageLocalPath)
 
-    if(!avatar){
-        throw new ApiError(400,"Avatar is compulsory")
-    }
+    // if(!avatar){
+    //     throw new ApiError(400,"Avatar is compulsory")
+    // }
 
     const user=await User.create({
         username: username.toLowerCase(),
-        fullName,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || "",
+        fullName : fullName || username,
+        avatar: defaultAvatar,
+        coverImage: defaultCoverImage,
         email,
         password,
     })
@@ -88,6 +92,8 @@ const registerUser = asyncHandler(async (req,res)=>{
 
 const loginUser= asyncHandler(async (req,res)=>{
     const {email, username, password}= req.body
+
+    console.log(req.body);
 
     if(!username && !email){
         throw new ApiError(400,"Username or email is required")
