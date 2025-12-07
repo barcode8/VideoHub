@@ -32,7 +32,7 @@ export const useRegisterController = () => {
         try {
             setLoading(true)
 
-            const res = await axios.post("http://localhost:5000/api/v1/users/login", data, {
+            const res = await axios.post("http://localhost:5000/api/v1/users/register", data, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 },

@@ -9,6 +9,8 @@ export const useLoginController = ()=>{
         password: ""
     })
 
+    const {login} = useAuth()
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [success, setSuccess] = useState(false)
