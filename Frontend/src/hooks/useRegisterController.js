@@ -1,6 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 
+/* This file's main functions are -
+1. Manages form state from user inputs in Register.jsx using the handleChange function implemented in onChange attribute
+2. Create an instance of FormData and store the final user input values in the FormData
+3. Send a POST request to the register user API with the FormData (facilitated by multer)*/
+
 export const useRegisterController = () => {
     const [formData, setFormData] = useState({
         username: "",
@@ -38,7 +43,7 @@ export const useRegisterController = () => {
                 headers: {
                     "Content-Type": "multipart/form-data" //One part different from other use__ hooks is that here we use multipart/form-data and not application/json since as we discussed before we are using multer here
                 },
-                withCredentials: true
+                withCredentials: true//Not using will cause the request to exclude the cookie, which the backend will then reject because of CORS
             })
             setSuccess(true)
         } catch (error) {

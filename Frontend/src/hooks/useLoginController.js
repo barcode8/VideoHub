@@ -2,6 +2,11 @@ import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext.jsx";
 
+/* This file's main functions are -
+1. Manages form state from user inputs in Login.jsx using the handleChange function implemented in onChange attribute
+2. Create an instance of JSON data from the formData and uses formData's final values
+3. Calls the user login api where the data sent is normal JSON*/
+
 export const useLoginController = ()=>{
     const [formData, setFormData] = useState({
         email: "",
@@ -46,7 +51,7 @@ export const useLoginController = ()=>{
                 headers: {
                     "Content-Type": "application/json"
                 },
-                withCredentials: true
+                withCredentials: true //Not using will cause the request to exclude the cookie, which the backend will then reject because of CORS
             })
 
             console.log(res)
