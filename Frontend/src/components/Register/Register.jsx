@@ -4,19 +4,29 @@ import { ClipLoader } from "react-spinners";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterController } from "../../hooks/useRegisterController.js";
 
+/* This file's main functions are - 
+1. Generates the user-visible registration page with random bubble generation in the background
+2. Handling data flow between registration hook and the component where it is the one providing attribute data
+*/
+
 export default function Register() {
+    //This function generates random bubbles which show up in the background of the registeration page
     const bubbles = useMemo(() =>
-        [...Array(15)].map(() => ({
-            size: Math.random() * 60 + 20,
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            duration: Math.random() * 6 + 4
+        //By using useMemo we are telling React to not re-calculate the bubble values every time there is any sort of change on the page for eg changes in input field
+        [...Array(15)].map(() => ({ //Here we create an empty array of 15 elements just so we can iterate
+            size: Math.random() * 60 + 20,//This calculates the size of each bubble which is random
+            top: `${Math.random() * 100}%`,//This calculates the position of each bubble on the y axis of the screen
+            left: `${Math.random() * 100}%`,//This calculates the position of each bubble on the x axis of the screen
+            duration: Math.random() * 6 + 4 //This calculates the duration of each bubble
         })), []
     );
 
     const { formData, handleChange, handleSubmit, loading, error, success } = useRegisterController();
+
+    //useNavigate lets us navigate to any route
     const navigate = useNavigate();
 
+    //Here we check whether the success value is true or not and if it is, the user gets redirected to the login page after 2.5 seconds
     useEffect(() => {
         if (success) {
             const timer = setTimeout(() => {
@@ -34,7 +44,7 @@ export default function Register() {
                 {bubbles.map((bubble, i) => (
                     <motion.div
                         key={i}
-                        className="absolute rounded-full bg-purple-600 opacity-10" // Changed to purple to match new theme
+                        className="absolute rounded-full bg-purple-600 opacity-10" 
                         style={{
                             width: bubble.size,
                             height: bubble.size,
@@ -66,6 +76,7 @@ export default function Register() {
                     ease: "easeOut"
                 }}
             >
+                {/* Using conditional rendering to display either a "successfully registered screen or the default registeration page" */}
                 {success ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-6">
                         <motion.svg
@@ -73,7 +84,7 @@ export default function Register() {
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth={2}
-                            stroke="#9333ea" // Purple-600 color
+                            stroke="#9333ea" 
                             className="w-20 h-20"
                             initial={{ pathLength: 0 }}
                             animate={{ pathLength: 1 }}
@@ -103,7 +114,7 @@ export default function Register() {
                             Create An Account
                         </h2>
 
-                        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                        <form className="space-y-4" onSubmit={handleSubmit}>
                             <div>
                                 <label htmlFor="email" className="text-zinc-300 block mb-2 text-sm">
                                     Email <span className="text-purple-500">*</span>
@@ -161,7 +172,7 @@ export default function Register() {
 
                             <div className="w-full flex justify-center pt-4">
                                 <motion.button
-                                    onClick={handleSubmit}
+                                    type="submit"
                                     className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold px-8 py-3 rounded-lg cursor-pointer flex justify-center items-center h-12"
                                     whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" }}
                                     whileTap={{ scale: 0.98 }}
