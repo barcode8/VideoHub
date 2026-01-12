@@ -9,6 +9,7 @@ export const useLoginController = ()=>{
         password: ""
     })
 
+    //Here, we are initialising the login method we defined in the Context, the method which lets us store user data in the context
     const {login} = useAuth()
 
     const [loading, setLoading] = useState(false)
@@ -16,6 +17,7 @@ export const useLoginController = ()=>{
     const [success, setSuccess] = useState(false)
 
     const handleChange = (e) => {
+        //So here what we are doing is that basically whenever onChange is triggered, the object would be set to empty and if we proceed normally with just asignment of one specific attribute that was changed, we would have one valid property and 2 empty ones, hence we use the spread command alongside prev which basically allows us to append the last valid entries of the object and then modify the value of whatever attribute the user targets
         setFormData((prev) => ({
             ...prev,
             [e.target.id]: e.target.value,
@@ -25,9 +27,11 @@ export const useLoginController = ()=>{
     const handleSubmit = async (e) =>{
         e.preventDefault();
 
+        //Checking whether the entered email address has an @ symbol or not
         const isEmail = formData.username.includes("@");
 
         const data = {
+            //Here, we validate isEmail and assign the attribute accordingly, there might be some confusion on why we are using formData.username either way and that is because in the Login.jsx component our username/email input has the id "username" so whatever the user enters, be it email or username, it will be stored in formData.username which we can later validate AND THEN assign its value to the correct attribute
             [isEmail ? "email" : "username"]: formData.username,
             password: formData.password,
         };
@@ -37,6 +41,7 @@ export const useLoginController = ()=>{
         try{
             setLoading(true)
 
+            //Sending login request to server
             const res = await axios.post("http://localhost:5000/api/v1/users/login", data, {
                 headers: {
                     "Content-Type": "application/json"
@@ -46,6 +51,7 @@ export const useLoginController = ()=>{
 
             console.log(res)
 
+            //Updating the Context's user data
             login(res.data.data.user);
 
             setSuccess(true)
