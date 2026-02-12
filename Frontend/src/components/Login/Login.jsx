@@ -6,20 +6,25 @@ import { useLoginController } from "../../hooks/useLoginController.js";
 
 export default function Login() {
 
+    //This function generates random bubbles which show up in the background of the registeration page
     const bubbles = useMemo(() =>
-        [...Array(15)].map(() => ({
-            size: Math.random() * 60 + 20,
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            duration: Math.random() * 6 + 4
+        //By using useMemo we are telling React to not re-calculate the bubble values every time there is any sort of change on the page for eg changes in input field
+        [...Array(15)].map(() => ({//Here we create an empty array of 15 elements just so we can iterate
+            size: Math.random() * 60 + 20,//This calculates the size of each bubble which is random
+            top: `${Math.random() * 100}%`,//This calculates the position of each bubble on the y axis of the screen
+            left: `${Math.random() * 100}%`,//This calculates the position of each bubble on the x axis of the screen
+            duration: Math.random() * 6 + 4 //This calculates the duration of each bubble
         })), []
     );
 
+    //This hook is used to navigate to certain routes
     const navigate = useNavigate()
 
+    //Here we are calling the useLoginController hook so we can access its data
     const {formData, handleChange, handleSubmit, loading, error, success} = useLoginController()
 
     useEffect(() => {
+            //If login was a success, we automatically redirect the user to home page after 2.5s
             if (success) {
                 const timer = setTimeout(() => {
                     navigate("/");
@@ -29,9 +34,9 @@ export default function Login() {
     }, [success, navigate]);
 
     return (
+        // Here we are displaying the previously created bubble background array
         <div className="bg-black h-screen w-screen flex items-center justify-center overflow-hidden relative font-roboto">
             
-            {/* Background Animation - Adapted to Purple Theme */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 {bubbles.map((bubble, i) => (
                     <motion.div
@@ -68,6 +73,7 @@ export default function Login() {
                     ease: "easeOut"
                 }}
             >
+                {/* If a success response is returned we display a success screen and redirect user to home page in 2.5s */}
                 {success ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-6">
                         <motion.svg
@@ -96,6 +102,7 @@ export default function Login() {
                         </p>
                     </div>
                 ) : (
+                    // Else we just display the login form
                     <>
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2 self-center text-center">
                             VideoHub
