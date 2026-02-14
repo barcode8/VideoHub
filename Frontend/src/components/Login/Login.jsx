@@ -4,6 +4,10 @@ import { ClipLoader } from "react-spinners";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginController } from "../../hooks/useLoginController.js";
 
+/* This file's main functions include-
+1. Displaying a login form which allows login facilitation
+2. Integrates the frontend form, the hook which communicates to the backend login api to ensure seamless and fluid login experience */
+
 export default function Login() {
 
     //This function generates random bubbles which show up in the background of the registeration page
