@@ -110,7 +110,7 @@ const loginUser= asyncHandler(async (req,res)=>{
     const isPasswordValid= await user.isPasswordCorrect(password)
 
     if(!isPasswordValid){
-        throw new ApiError(401, "Password is incorrect")
+        throw new ApiError(401, "Email or password is incorrect")
     }
 
     const {accessToken, refreshToken}= await generateAccessAndRefreshTokens(user._id)
@@ -178,7 +178,7 @@ const refreshAccessToken= asyncHandler(async (req,res)=>{
     
         const user= await User.findById(decodedToken?._id)
     
-        if(user){
+        if(!user){
             throw new ApiError(401,"Invalid Refresh Token")
         }
     
