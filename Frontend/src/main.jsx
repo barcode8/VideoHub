@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import {createBrowserRouter, createRoutesFromElements, RouterProvider, Route} from "react-router-dom"
 import Layout from './Layout.jsx'
 import Home from './components/Home/Home.jsx'
+import ChangePassword from './components/ChangePassword/ChangePassword.jsx'
 import './App.css'
 import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
@@ -19,6 +20,8 @@ const router= createBrowserRouter(
         {/* In this what we have done is basically created a portrait, the / path is the wall (base layer), the Layout component is the picture frame and the various routes are the actual portrait  */}
         <Route element={<Layout />}>
 
+          {/* Change password route */}
+          <Route path='/change-password' element={<ChangePassword/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>

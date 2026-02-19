@@ -10,7 +10,7 @@ import { useLoginController } from "../../hooks/useLoginController.js";
 
 export default function Login() {
 
-    //This function generates random bubbles which show up in the background of the registeration page
+    //This function generates random bubbles which show up in the background of the login page
     const bubbles = useMemo(() =>
         //By using useMemo we are telling React to not re-calculate the bubble values every time there is any sort of change on the page for eg changes in input field
         [...Array(15)].map(() => ({//Here we create an empty array of 15 elements just so we can iterate
