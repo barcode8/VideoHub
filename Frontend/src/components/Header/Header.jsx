@@ -25,7 +25,6 @@ export default function Header() {
                         </Link>
 
                         <div className="hidden md:flex items-center gap-6">
-                            {/* Here we are iterating over this array to display the contents as seperate elements, helps reduce redundancy*/}
                             {['Home', 'Trending', 'Subscriptions', 'Library'].map((item) => (
                                 <a
                                     key={item}
@@ -47,8 +46,6 @@ export default function Header() {
                                 onChange={(e) => setQuery(e.target.value)}
                                 onFocus={() => setSearchFocused(true)}
                                 onBlur={() => setSearchFocused(false)}
-
-                                // This here displays a purple boundary around the search bar when focused on
                                 className={`w-full bg-zinc-900 text-white px-4 py-2 pl-10 pr-10 rounded-full border transition-all duration-300 outline-none ${
                                     searchFocused
                                         ? 'border-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.6)]'
@@ -57,7 +54,6 @@ export default function Header() {
                             />
                             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             
-                            {/* Renders an X sign next to search query */}
                             {query && (
                                 <button 
                                     onClick={() => setQuery("")}
@@ -111,7 +107,6 @@ export default function Header() {
                                 </motion.button>
 
                                 <AnimatePresence>
-                                    {/* Displaying username and logout options */}
                                     {profileOpen && (
                                         <motion.div
                                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -125,6 +120,16 @@ export default function Header() {
                                                 </p>
                                                 <p className="text-zinc-500 text-xs truncate">@{user.username}</p>
                                             </div>
+
+                                            {/* ADDED: Edit Details / View Channel Option */}
+                                            <Link
+                                                to="/change-details"
+                                                onClick={() => setProfileOpen(false)}
+                                                className="w-full flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800/50 hover:text-purple-400 transition-colors"
+                                            >
+                                                <LuUser size={16} />
+                                                Edit Details
+                                            </Link>
                                             
                                             <button
                                                 onClick={() => {

@@ -4,6 +4,7 @@ import {createBrowserRouter, createRoutesFromElements, RouterProvider, Route} fr
 import Layout from './Layout.jsx'
 import Home from './components/Home/Home.jsx'
 import ChangePassword from './components/ChangePassword/ChangePassword.jsx'
+import ChangeUserDetails from './components/ChangeUserDetails/ChangeUserDetails.jsx'
 import './App.css'
 import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
@@ -22,6 +23,7 @@ const router= createBrowserRouter(
 
           {/* Change password route */}
           <Route path='/change-password' element={<ChangePassword/>}/>
+          <Route path='/change-details' element={<ChangeUserDetails/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>

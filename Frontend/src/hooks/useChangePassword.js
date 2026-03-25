@@ -28,6 +28,7 @@ export const useChangePassword = ()=>{
 
     const handleSubmit = async (e)=>{
         e.preventDefault();
+        setLoading(true)
         const data = {
             oldPassword : formData.oldPassword,
             newPassword : formData.newPassword
