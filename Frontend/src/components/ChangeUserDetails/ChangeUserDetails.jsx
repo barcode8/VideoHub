@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LuCamera, LuShieldCheck, LuSave, LuExternalLink, LuLoader2, LuInfo } from 'react-icons/lu';
+import { LuCamera, LuShieldCheck, LuSave, LuExternalLink, LuLoader, LuInfo } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { useChangeUserDetails } from '../../hooks/useChangeUserDetails';
@@ -8,6 +8,10 @@ import { useChangeUserDetails } from '../../hooks/useChangeUserDetails';
 const ChangeUserDetails = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    
+    // Initialize refs for the file inputs
+    const coverInputRef = useRef(null);
+    const avatarInputRef = useRef(null);
 
     const {
         fullName, handleFullNameChange,
@@ -15,6 +19,19 @@ const ChangeUserDetails = () => {
         handleSubmit, loading, error, success,
         avatar, coverImage
     } = useChangeUserDetails();
+
+    //Listen for success and auto-sync the frontend with the backend
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                // Reloads the page to fetch the new user data and clear memory states
+                window.location.reload();
+            }, 1000); // 1-second delay so they can read the success message
+            
+            // Cleanup the timer if the component unmounts early
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     return (
         <div className="min-h-screen bg-[#000000] text-white pt-24 pb-12 px-4 md:px-8 font-roboto">
@@ -33,13 +50,15 @@ const ChangeUserDetails = () => {
                         {/* Cover Image Section */}
                         <section className="bg-[#18181b] rounded-2xl overflow-hidden border border-[#3f3f46]">
                             
-                            {/* Clickable Area - Clean, flat structure */}
-                            <label htmlFor="coverImageInput" className="block relative h-48 w-full bg-[#27272a] cursor-pointer">
+                            <div 
+                                onClick={() => coverInputRef.current.click()} 
+                                className="group block relative h-48 w-full bg-[#27272a] cursor-pointer"
+                            >
                                 {(user?.coverImage || coverImage) ? (
                                     <img
                                         src={coverImage ? URL.createObjectURL(coverImage) : user.coverImage}
                                         alt="Cover"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover pointer-events-none transition-transform duration-500 group-hover:scale-105" 
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
@@ -47,18 +66,24 @@ const ChangeUserDetails = () => {
                                     </div>
                                 )}
 
-                                {/* Unsaved badge (Kept because it doesn't block the main image area) */}
+                                {/* Hover Overlay */}
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                    <div className="flex items-center gap-2 bg-black/60 text-white px-4 py-2 rounded-full font-medium backdrop-blur-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                        <LuCamera size={20} />
+                                        <span>Change Banner</span>
+                                    </div>
+                                </div>
+
                                 {coverImage && (
                                     <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-lg flex items-center gap-1.5 z-10">
                                         <LuInfo size={14} /> Unsaved Change
                                     </div>
                                 )}
-                            </label>
+                            </div>
 
-                            {/* Input strictly separated from the label */}
                             <input
                                 type="file"
-                                id="coverImageInput"
+                                ref={coverInputRef}
                                 accept="image/*"
                                 className="hidden"
                                 onChange={(e) => {
@@ -80,20 +105,27 @@ const ChangeUserDetails = () => {
                                 {/* Avatar */}
                                 <div className="relative mx-auto md:mx-0">
                                     
-                                    <label htmlFor="avatarInput" className="block cursor-pointer">
-                                        <div className="w-32 h-32 rounded-full bg-[#27272a] border-4 border-[#3f3f46] overflow-hidden">
+                                    <div 
+                                        onClick={() => avatarInputRef.current.click()} 
+                                        className="group block cursor-pointer"
+                                    >
+                                        <div className="relative w-32 h-32 rounded-full bg-[#27272a] border-4 border-[#3f3f46] overflow-hidden">
                                             <img
                                                 src={avatar ? URL.createObjectURL(avatar) : user?.avatar}
                                                 alt="Avatar"
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover pointer-events-none"
                                             />
+                                            
+                                            {/* Hover Overlay */}
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                <LuCamera className="text-white transform scale-75 group-hover:scale-100 transition-transform duration-300" size={32} />
+                                            </div>
                                         </div>
-                                    </label>
+                                    </div>
 
-                                    {/* Input strictly separated from the label */}
                                     <input
                                         type="file"
-                                        id="avatarInput"
+                                        ref={avatarInputRef}
                                         accept="image/*"
                                         className="hidden"
                                         onChange={(e) => {
@@ -131,7 +163,7 @@ const ChangeUserDetails = () => {
                                         onClick={handleSubmit}
                                         className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 px-8 py-3 rounded-full font-bold disabled:opacity-50"
                                     >
-                                        {loading ? <LuLoader2 className="animate-spin" size={18} /> : <LuSave size={18} />}
+                                        {loading ? <LuLoader className="animate-spin" size={18} /> : <LuSave size={18} />}
                                         {loading ? "Saving..." : "Save Changes"}
                                     </motion.button>
                                 </div>

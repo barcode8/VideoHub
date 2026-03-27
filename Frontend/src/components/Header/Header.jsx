@@ -28,7 +28,7 @@ export default function Header() {
                             {['Home', 'Trending', 'Subscriptions', 'Library'].map((item) => (
                                 <a
                                     key={item}
-                                    href="#"
+                                    href="/"
                                     className="text-zinc-400 hover:text-pink-500 transition-colors text-sm font-medium"
                                 >
                                     {item}
