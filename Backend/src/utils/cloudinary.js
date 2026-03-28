@@ -13,15 +13,25 @@ cloudinary.config({
 })
 
 
-const uploadOnCloudinary = async function(localFilePath){
+const uploadOnCloudinary = async function(localFilePath, isVideo = false){
     try {
         if(!localFilePath) return null
 
-        //This line allows us to upload server content to cloudinary
-        const response = await cloudinary.uploader.upload(localFilePath,{
-            //This allows any type of file to be uploaded
+        let uploadOptions = {
             resource_type: "auto"
-        })
+        };
+
+        // If it's a video, apply the 1080p limit
+        if (isVideo) {
+            uploadOptions.resource_type = "video";
+            uploadOptions.transformation = [
+                // "limit" means: only scale down if it exceeds these dimensions. Never scale up.
+                { width: 1920, height: 1080, crop: "limit" } 
+            ];
+        }
+
+        //This line allows us to upload server content to cloudinary
+        const response = await cloudinary.uploader.upload(localFilePath, uploadOptions)
 
         //This deletes the file stored in the public folder after uploading
         fs.unlinkSync(localFilePath)
