@@ -164,6 +164,7 @@ const updateVideo = asyncHandler(async (req, res) => {
         
         updateFields.thumbnail = thumbnail.url;
 
+        //Deleting existing thumbnail from cloudinary
         if(existingVideo.thumbnail){
             try {
                 // Extract public ID from the old URL
@@ -262,6 +263,37 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    //Check if we recieved video id or not
+    if(!videoId){
+        throw new ApiError(400, "VideoId not received")
+    }
+
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    //Check if recieved videoId is valid or not
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video ID format")
+    }
+
+    // Security check: Ensure only the person who uploaded the video can hide/unhide it
+    if (video.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "You do not have permission to toggle this video's status");
+    }
+
+    // Flip the current boolean value
+    video.isPublished = !video.isPublished;
+    
+    // Save the updated document
+    await video.save({ validateBeforeSave: false });
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {isPublished : video.isPublished}, `Video is now ${video.isPublished ? "Published" : "Hidden"}`))
 })
 
 export {
