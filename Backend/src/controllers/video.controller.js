@@ -97,7 +97,24 @@ async function processVideoBackground(videoId, videoLocalPath, thumbnailLocalPat
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: get video by id
+
+    if(!videoId){
+        throw new ApiError(400, "VideoId not received")
+    }
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video ID format")
+    }
+
+    const response = await Video.findById(videoId)
+
+    if(!response){
+        throw new ApiError(404, "Video could not be fetched")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, response, "Video fetched successfully"))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
