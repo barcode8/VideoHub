@@ -98,14 +98,17 @@ async function processVideoBackground(videoId, videoLocalPath, thumbnailLocalPat
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
+    //Check if we recieved video id or not
     if(!videoId){
         throw new ApiError(400, "VideoId not received")
     }
 
+    //Check if recieved videoId is valid or not
     if (!isValidObjectId(videoId)) {
         throw new ApiError(400, "Invalid Video ID format")
     }
 
+    //Find record in Mongo through videoId
     const response = await Video.findById(videoId)
 
     if(!response){
@@ -125,7 +128,59 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
+    
+    //Check if we recieved video id or not
+    if(!videoId){
+        throw new ApiError(400, "VideoId not received")
+    }
+
+    //Check if recieved videoId is valid or not
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video ID format")
+    }
+
+    //Find record in Mongo through videoId
+    const video = await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError("Video not found")
+    }
+
+    //We need to extract the public url of video and thumbnail to delete them from cloudinary
+    const extractPublicId = (url) => {
+        if (!url) return null;
+        const parts = url.split("/");
+        const fileWithExtension = parts[parts.length - 1];
+        return fileWithExtension.split(".")[0];
+    };
+
+    const videoPublicId = extractPublicId(video.videoFile);
+    const thumbnailPublicId = extractPublicId(video.thumbnail);
+
+    try {
+        if (videoPublicId) {
+            // Video files require the resource_type to be explicitly set to "video"
+            await cloudinary.uploader.destroy(videoPublicId, { resource_type: "video" });
+        }
+        
+        if (thumbnailPublicId) {
+            // Images are the default resource_type, so no extra options are needed
+            await cloudinary.uploader.destroy(thumbnailPublicId);
+        }
+    } catch (error) {
+        console.error("Failed to delete files from Cloudinary:", error);
+        throw new ApiError(500, "Failed to delete associated files from cloud storage");
+    }
+
+    const response = await Video.findByIdAndDelete(videoId)
+
+    if(!response){
+        throw new ApiError(404, "Video could not be fetched")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, response, "Video deleted successfully"))
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
