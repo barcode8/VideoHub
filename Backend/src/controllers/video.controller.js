@@ -25,10 +25,13 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const videoLocalPath = req.files?.videoFile?.[0]?.path
     const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path
 
-    if (!videoLocalPath || !thumbnailLocalPath) {
-        throw new ApiError(400, "Video and thumbnail files are required")
+    if (!videoLocalPath) {
+        throw new ApiError(400, "Video files are required")
     }
 
+    if (!thumbnailLocalPath) {
+        throw new ApiError(400, "Thumbnail files are required")
+    }
     // 1. Create a "processing" placeholder in the database
     const video = await Video.create({
         title,
@@ -40,15 +43,17 @@ const publishAVideo = asyncHandler(async (req, res) => {
         owner: req.user._id 
     })
 
-    const videoUpload = await uploadOnCloudinary(videoLocalPath)
-    const thumbnailUpload = await uploadOnCloudinary(thumbnailLocalPath)
-
     processVideoBackground(video._id, videoLocalPath, thumbnailLocalPath).catch(console.error)
+
+    //Sending this response so that the request stops processing
+    return res.status(200).json(
+        new ApiResponse(200, video, "Video is uploading and processing in the background")
+    )
 })
 
 async function processVideoBackground(videoId, videoLocalPath, thumbnailLocalPath){
     try {
-        const videoUpload = uploadOnCloudinary(videoLocalPath, true)
+        const videoUpload = await uploadOnCloudinary(videoLocalPath, true)
 
         if (!videoUpload) {
             await Video.findByIdAndDelete(videoId);
