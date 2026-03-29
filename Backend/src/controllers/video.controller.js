@@ -122,8 +122,85 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const {title, description} = req.body
 
+    //Recieve thumbnail local path
+    const thumbnailLocalPath = req.file?.path
+
+    //Check if we recieved video id or not
+    if(!videoId){
+        throw new ApiError(400, "VideoId not received")
+    }
+
+    //Check if recieved videoId is valid or not
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video ID format")
+    }
+
+    const existingVideo = await Video.findById(videoId);
+
+    if (!existingVideo) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    // Create an empty object to store only the fields the user actually provided
+    const updateFields = {}
+
+    if (title && title.trim() !== "") {
+        updateFields.title = title;
+    }
+
+    if (description && description.trim() !== "") {
+        updateFields.description = description;
+    }
+
+    //Only process the thumbnail if a new one was actually uploaded
+    if(thumbnailLocalPath){
+        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+
+        if(!thumbnail.url){
+            throw new ApiError(500, "Error while uploading the thumbnail")
+        }
+        
+        updateFields.thumbnail = thumbnail.url;
+
+        if(existingVideo.thumbnail){
+            try {
+                // Extract public ID from the old URL
+                const parts = existingVideo.thumbnail.split("/");
+                const fileWithExtension = parts[parts.length - 1];
+                const publicId = fileWithExtension.split(".")[0];
+
+                await cloudinary.uploader.destroy(publicId);
+            } catch (error) {
+                console.error("Failed to delete old thumbnail from Cloudinary:", error);
+            }
+        }
+    }
+
+    // Prevent unnecessary database calls if no fields were provided at all
+    if (Object.keys(updateFields).length === 0) {
+        throw new ApiError(400, "Please provide at least one field (title, description, or thumbnail) to update")
+    }
+
+    //Find video record then update the thumbnail field with the new url
+    const video=await Video.findByIdAndUpdate(
+        videoId,
+        {
+            $set: updateFields
+        },
+        {new:true}
+    )
+
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, video, "Video details changed successfully")
+    )
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
