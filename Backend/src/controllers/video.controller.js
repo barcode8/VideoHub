@@ -11,7 +11,88 @@ import fs from "fs"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
+    
+    const pageNumber = parseInt(page, 10)
+    const limitNumber = parseInt(limit, 10)
+
+    //Building the match conditions object
+    const matchConditions = {
+        isPublished : true //We only want to show published videos
+    }
+
+    //If a query exists, we search for it using regex DB operator
+    if(query){
+        matchConditions.$or = [
+            {title : {$regex: query, $options: "i"}},
+            {description : {$regex : query, $options: "i"}}
+        ];
+    }
+
+    //If a userid is provided, display videos belonging only to that user
+    if(userId){
+        if(!isValidObjectId(userId)){
+            throw new ApiError(400, "Invalid User")
+        }
+
+        //Convert string ID into an object ID
+        matchConditions.owner = new mongoose.Types.ObjectId(userId);
+    }
+
+    //Building the sort object
+    const sortOptions = {}
+    if(sortBy){
+        //sortType is usually asc or desc, 1 stands for asc and -1 for desc
+        sortOptions[sortBy] = sortType === "asc" ? 1 : -1
+    }else{
+        //Default fallback, sort by newest uploaded videos
+        sortOptions["createdAt"] = -1;
+    }
+
+    //Making the aggregation pipeline
+    const pipeline = [
+        {
+            $match : matchConditions
+        },
+        {
+            $sort : sortOptions
+        },
+        {
+            $lookup: {
+                from : "users",
+                localField : "owner",
+                foreignField : "_id",
+                as : "ownerDetails",
+                pipeline : [
+                    {
+                        $project : {
+                            username : 1,
+                            avatar : 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields : {
+                ownerDetails : {$first : "$ownerDetails"}
+            }
+        }
+    ];
+
+    //Execute Pagenation
+    const aggregate = Video.aggregate(pipeline);
+
+    const options = {
+        page : pageNumber,
+        limit : limitNumber,
+    }
+
+    const result = await Video.aggregatePaginate(aggregate, options)
+
+    //Send final response
+    return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Videos fetched successfully"))
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
