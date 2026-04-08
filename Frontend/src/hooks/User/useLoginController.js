@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 /* This file's main functions are -
 1. Manages form state from user inputs in Login.jsx using the handleChange function implemented in onChange attribute

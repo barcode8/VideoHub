@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { LuCamera, LuShieldCheck, LuSave, LuExternalLink, LuLoader, LuInfo } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import { useChangeUserDetails } from '../../hooks/useChangeUserDetails';
+import { useChangeUserDetails } from '../../hooks/User/useChangeUserDetails.js';
 
 const ChangeUserDetails = () => {
     const { user } = useAuth();
