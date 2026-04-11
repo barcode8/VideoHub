@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { useChangePassword } from "../../hooks/useChangePassword.js";
+import { useChangePassword } from "../../hooks/User/useChangePassword.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useMemo, useEffect } from "react";
 

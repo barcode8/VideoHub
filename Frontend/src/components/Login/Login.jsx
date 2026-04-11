@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import { Link, useNavigate } from "react-router-dom";
-import { useLoginController } from "../../hooks/useLoginController.js";
+import { useLoginController } from "../../hooks/User/useLoginController.js";
 
 /* This file's main functions include-
 1. Displaying a login form which allows login facilitation

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useMemo, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 import { Link, useNavigate } from "react-router-dom";
-import { useRegisterController } from "../../hooks/useRegisterController.js";
+import { useRegisterController } from "../../hooks/User/useRegisterController.js";
 
 /* This file's main functions are - 
 1. Generates the user-visible registration page with random bubble generation in the background
