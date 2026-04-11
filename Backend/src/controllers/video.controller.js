@@ -95,7 +95,17 @@ const getAllVideos = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "Videos fetched successfully"))
 })
 
-const publishAVideo = asyncHandler(async (req, res) => {
+const initVideoUpload = asyncHandler(async (req,res)=>{
+    // 1. Generate a valid MongoDB ID in memory. NO database insert
+    const futureVideoId = new mongoose.Types.ObjectId();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {videoId : futureVideoId}, "Video Id generated successfully"))
+})
+
+const publishVideoDraft = asyncHandler(async (req, res) => {
+    const {videoId} = req.params;
     const { title, description} = req.body
     
     //Validating text fields
@@ -110,11 +120,12 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Video files are required")
     }
 
-    if (!thumbnailLocalPath) {
-        throw new ApiError(400, "Thumbnail files are required")
-    }
+    // if (!thumbnailLocalPath) {
+    //     throw new ApiError(400, "Thumbnail files are required")
+    // }
     // 1. Create a "processing" placeholder in the database
     const video = await Video.create({
+        _id : videoId,
         title,
         description,
         videoFile: "processing", // Placeholder
@@ -134,44 +145,45 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 async function processVideoBackground(videoId, videoLocalPath, thumbnailLocalPath){
     try {
-        const videoUpload = await uploadOnCloudinary(videoLocalPath, true)
+        // 1. Upload Video
+        const videoUpload = await uploadOnCloudinary(videoLocalPath, true);
 
         if (!videoUpload) {
             await Video.findByIdAndDelete(videoId);
             return;
         }
 
-        // 1 hour = 3600 seconds. Check Cloudinary's calculated duration.
         if(videoUpload.duration > 3600){
-            // A. Delete the oversized file from Cloudinary 
             await cloudinary.uploader.destroy(videoUpload.public_id, { resource_type: "video" });
-
-            // B. Delete the database placeholder
             await Video.findByIdAndDelete(videoId);
-
-            // C. Delete the local thumbnail (since uploadOnCloudinary didn't process it yet)
-            if (fs.existsSync(thumbnailLocalPath)) {
-                fs.unlinkSync(thumbnailLocalPath);
-            }
-            
+            if (fs.existsSync(thumbnailLocalPath)) fs.unlinkSync(thumbnailLocalPath);
             console.error(`Video ${videoId} rejected: Exceeded 1 hour limit.`);
             return;
         }
 
-        // Upload the thumbnail (passing false or nothing so it doesn't get video transformations)
-        const thumbnailUpload = await uploadOnCloudinary(thumbnailLocalPath);
+        // 2. Handle the Thumbnail (Custom vs. Auto-Generated)
+        let finalThumbnailUrl = "";
 
-        // Update the database with the final URLs and publish
+        if (thumbnailLocalPath) {
+            const thumbnailUpload = await uploadOnCloudinary(thumbnailLocalPath);
+            finalThumbnailUrl = thumbnailUpload?.url || "";
+        } else {
+            // Auto-thumbnail trick
+            const splitUrl = videoUpload.url.split("/upload/");
+            finalThumbnailUrl = `${splitUrl[0]}/upload/so_auto/${splitUrl[1].replace(".mp4", ".jpg")}`;
+        }
+
+        // 3. Update ONLY the media fields and publish status
         await Video.findByIdAndUpdate(videoId, {
             videoFile: videoUpload.url,
-            thumbnail: thumbnailUpload?.url || "",
+            thumbnail: finalThumbnailUrl,
             duration: videoUpload.duration,
             isPublished: true 
+            // title and description are left untouched because they are already correct!
         });
 
     } catch (error) {
         console.error("Background processing failed for video:", videoId, error);
-        // Clean up the placeholder if something crashes
         await Video.findByIdAndDelete(videoId);
     }
 }
@@ -379,9 +391,10 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
 export {
     getAllVideos,
-    publishAVideo,
+    publishVideoDraft,
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    initVideoUpload
 }

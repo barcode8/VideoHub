@@ -3,7 +3,8 @@ import {
     deleteVideo,
     getAllVideos,
     getVideoById,
-    publishAVideo,
+    publishVideoDraft,
+    initVideoUpload,
     togglePublishStatus,
     updateVideo,
 } from "../controllers/video.controller.js"
@@ -12,6 +13,8 @@ import {upload} from "../middlewares/multer.middleware.js"
 
 const router = Router();
 router.use(verifyJwt); // Apply verifyJWT middleware to all routes in this file
+
+router.route("/init").post(initVideoUpload);
 
 router
     .route("/")
@@ -28,7 +31,7 @@ router
             },
             
         ]),
-        publishAVideo
+        publishVideoDraft
     );
 
 router
