@@ -11,6 +11,7 @@ import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
 import '@fontsource/roboto'; 
 import { AuthProvider } from './context/AuthContext.jsx'
+import MyChannel from './components/MyChannel/MyChannel.jsx'
 
 const router= createBrowserRouter(
   //Defining all the routes in this section
@@ -26,6 +27,7 @@ const router= createBrowserRouter(
           <Route path='/change-password' element={<ChangePassword/>}/>
           <Route path='/change-details' element={<ChangeUserDetails/>}/>
           <Route path='/upload' element={<UploadVideo/>}/>
+          <Route path='/channel' element={<MyChannel/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>
