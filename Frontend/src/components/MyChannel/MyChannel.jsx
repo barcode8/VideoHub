@@ -40,9 +40,9 @@ export default function MyChannel() {
             {/* Banner Section */}
             <div className="w-full h-48 md:h-64 lg:h-80 bg-zinc-900 relative">
                 {user?.coverImage ? (
-                    <img 
-                        src={user.coverImage} 
-                        alt="Channel Banner" 
+                    <img
+                        src={user.coverImage}
+                        alt="Channel Banner"
                         className="w-full h-full object-cover"
                     />
                 ) : (
@@ -53,9 +53,9 @@ export default function MyChannel() {
             {/* Profile Info Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="relative flex flex-col md:flex-row items-center md:items-end gap-6 -mt-12 md:-mt-16 mb-12">
-                    <img 
-                        src={user?.avatar || 'https://via.placeholder.com/150'} 
-                        alt="Channel Avatar" 
+                    <img
+                        src={user?.avatar || 'https://via.placeholder.com/150'}
+                        alt="Channel Avatar"
                         className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-black object-cover bg-zinc-800"
                     />
                     <div className="flex-1 text-center md:text-left pb-2">
@@ -71,7 +71,7 @@ export default function MyChannel() {
                     </div>
                     <div className="pb-2">
                         <Link to="/change-details">
-                            <motion.button 
+                            <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className="bg-[#27272a] hover:bg-[#3f3f46] border border-[#3f3f46] text-white font-medium px-6 py-2.5 rounded-full transition-colors"
@@ -100,29 +100,34 @@ export default function MyChannel() {
                             Array(4).fill(0).map((_, i) => <VideoSkeleton key={i} />)
                         ) : videos.length > 0 ? (
                             videos.map((video) => (
-                                <motion.div 
-                                    key={video._id} 
+                                <motion.div
+                                    key={video._id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="group bg-[#18181b] rounded-xl overflow-hidden border border-[#3f3f46] hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(147,51,234,0.15)] transition-all duration-300"
                                 >
                                     <div className="relative aspect-video">
-                                        <img 
-                                            src={video.thumbnail} 
-                                            alt={video.title} 
+                                        <img
+                                            src={video.thumbnail}
+                                            alt={video.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
-                                        
+
                                         {/* Edit/Delete Overlay */}
                                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-10">
-                                            <button 
-                                                className="p-3 bg-purple-600 hover:bg-purple-500 rounded-full text-white transition-transform hover:scale-110" 
-                                                title="Edit Video"
-                                            >
-                                                <LuPencil size={20} />
-                                            </button>
-                                            <button 
-                                                className="p-3 bg-red-600 hover:bg-red-500 rounded-full text-white transition-transform hover:scale-110" 
+                                            <Link
+                                                to={`/edit-video/${video._id}`}
+                                                state={{ video: video }}>
+                                                <button
+                                                    className="p-3 bg-purple-600 hover:bg-purple-500 rounded-full text-white transition-transform hover:scale-110"
+                                                    title="Edit Video"
+                                                >
+                                                    <LuPencil size={20} />
+                                                </button>
+                                            </Link>
+
+                                            <button
+                                                className="p-3 bg-red-600 hover:bg-red-500 rounded-full text-white transition-transform hover:scale-110"
                                                 title="Delete Video"
                                             >
                                                 <LuTrash2 size={20} />
