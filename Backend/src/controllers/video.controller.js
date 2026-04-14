@@ -16,9 +16,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const limitNumber = parseInt(limit, 10)
 
     //Building the match conditions object
-    const matchConditions = {
-        isPublished : true //We only want to show published videos
-    }
+    const matchConditions = {}
 
     //If a query exists, we search for it using regex DB operator
     if(query){
@@ -36,6 +34,18 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
         //Convert string ID into an object ID
         matchConditions.owner = new mongoose.Types.ObjectId(userId);
+
+        // Check: Is the person logged in (req.user) the same as the channel owner (userId)?
+        const isOwner = req.user?._id?.toString() === userId;
+
+        // If NOT the owner, they should only see published videos.
+        // If they ARE the owner, we don't add the isPublished filter, showing EVERYTHING.
+        if (!isOwner) {
+            matchConditions.isPublished = true;
+        }
+    }else{
+        // If no userId is provided (General Feed), always only show published
+        matchConditions.isPublished = true;
     }
 
     //Building the sort object

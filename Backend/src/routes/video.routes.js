@@ -8,13 +8,13 @@ import {
     togglePublishStatus,
     updateVideo,
 } from "../controllers/video.controller.js"
-import { verifyJwt } from "../middlewares/auth.middleware.js";
+import { verifyJwt, verifyJWTIfAvailable } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js"
 
 const router = Router();
 
 // Public routes (No verifyJwt here)
-router.route("/").get(getAllVideos);
+router.route("/").get(verifyJWTIfAvailable, getAllVideos);
 router.route("/v/:videoId").get(getVideoById); 
 
 // Protected routes (Add verifyJwt as a middleware argument)

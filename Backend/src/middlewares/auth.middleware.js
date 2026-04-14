@@ -31,3 +31,23 @@ export const verifyJwt= asyncHandler(async (req, res, next)=>{
         throw new ApiError(401, "Invalid access token")
     }
 })
+
+export const verifyJWTIfAvailable = asyncHandler(async (req, res, next) => {
+    try {
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+        
+        if (!token) {
+            return next(); // No token? No problem. Just move to the controller.
+        }
+
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+        
+        if (user) {
+            req.user = user; // Found a user! Attach them to the request.
+        }
+        next();
+    } catch (error) {
+        next(); // Even if the token is invalid/expired, we just treat them as a guest.
+    }
+});
