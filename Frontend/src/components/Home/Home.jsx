@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar.jsx';
-import VideoCard, { VideoSkeleton } from '../VideoCard/VideoCard.jsx';
+import { VideoSkeleton } from '../Skeleton/VideoSkeleton.jsx';
+import VideoCard from '../VideoCard/VideoCard.jsx'
 
 export default function Home() {
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    //Here we send an api call to fetch ALL available videos
     useEffect(() => {
         const fetchVideos = async () => {
             try {
@@ -28,8 +30,7 @@ export default function Home() {
             <Sidebar />
 
             <main className="flex-1 overflow-y-auto h-[calc(100vh-64px)]">
-                <div className="p-6 md:p-10"> {/* Increased padding for better whitespace */}
-                    {/* Grid updated to max 3 columns for a less "stuffy" feel */}
+                <div className="p-6 md:p-10"> 
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
                         {loading ? (
                             Array(6).fill(0).map((_, i) => <VideoSkeleton key={i} />)

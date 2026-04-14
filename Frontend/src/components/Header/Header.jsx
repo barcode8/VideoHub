@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { LuSearch, LuUpload, LuX, LuMenu, LuLogOut, LuUser, LuBell } from "react-icons/lu"; 
+import { LuSearch, LuUpload, LuX, LuMenu, LuLogOut, LuUser, LuBell, LuMonitorPlay } from "react-icons/lu";
 import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function Header() {
@@ -16,7 +16,7 @@ export default function Header() {
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-zinc-800 font-roboto h-16">
             <div className="px-4 sm:px-6 lg:px-8 h-full">
                 <div className="flex items-center justify-between h-full">
-                    
+
                     {/* 1. Left Section - Made flex-1 so it takes up equal space as the right side */}
                     <div className="flex flex-1 items-center min-w-[200px] pr-4 lg:pr-8">
                         <Link to="/" className="shrink-0">
@@ -24,7 +24,7 @@ export default function Header() {
                                 VidShare
                             </h1>
                         </Link>
-                        
+
                         {/* mx-auto pushes these links to the perfect center between the Logo and the Search Bar */}
                         <div className="hidden xl:flex items-center gap-6 mx-auto">
                             {['Home', 'Trending', 'Subscriptions', 'Library'].map((item) => (
@@ -45,11 +45,10 @@ export default function Header() {
                                 onChange={(e) => setQuery(e.target.value)}
                                 onFocus={() => setSearchFocused(true)}
                                 onBlur={() => setSearchFocused(false)}
-                                className={`w-full bg-zinc-900 text-white px-4 py-2 pl-10 pr-10 rounded-full border transition-all duration-300 outline-none ${
-                                    searchFocused
+                                className={`w-full bg-zinc-900 text-white px-4 py-2 pl-10 pr-10 rounded-full border transition-all duration-300 outline-none ${searchFocused
                                         ? 'border-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]'
                                         : 'border-zinc-700'
-                                }`}
+                                    }`}
                             />
                             <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             {query && (
@@ -67,7 +66,7 @@ export default function Header() {
                         </button>
 
                         <Link to="/upload">
-                            <motion.button 
+                            <motion.button
                                 className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-4 py-2 rounded-full"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -103,9 +102,15 @@ export default function Header() {
                                                 <p className="text-white text-sm font-bold truncate">{user.fullName || user.username}</p>
                                                 <p className="text-zinc-500 text-xs truncate">@{user.username}</p>
                                             </div>
+
                                             <Link to="/change-details" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800">
                                                 <LuUser size={16} /> Edit Details
                                             </Link>
+
+                                            <Link to="/channel" onClick={() => setProfileOpen(false)} className="w-full flex items-center gap-2 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 border-b border-zinc-800">
+                                                <LuMonitorPlay size={16} /> View Channel
+                                            </Link>
+                                            
                                             <button onClick={() => { logout(); setProfileOpen(false); }} className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-zinc-800 text-left">
                                                 <LuLogOut size={16} /> Sign Out
                                             </button>
