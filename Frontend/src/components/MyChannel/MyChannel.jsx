@@ -3,22 +3,24 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { LuPencil, LuTrash2, LuEyeOff } from 'react-icons/lu';
+import { LuPencil, LuTrash2, LuEyeOff, LuEye } from 'react-icons/lu';
 import { VideoSkeleton } from '../Skeleton/VideoSkeleton.jsx';
 import { formatDuration } from '../../utils/formatTime.js';
 import Sidebar from '../Sidebar/Sidebar.jsx';
+import { useTogglePublish } from '../../hooks/Video/useTogglePublish.js';
 
 export default function MyChannel() {
     const { user } = useAuth();
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { togglePublish, isToggling } = useTogglePublish();
 
     useEffect(() => {
         const fetchMyVideos = async () => {
             try {
                 const response = await axios.get(
                     `http://localhost:5000/api/v1/videos?userId=${user?._id}`,
-                    { withCredentials: true } // Identification for owner/drafts
+                    { withCredentials: true }
                 );
                 if (response.data?.success) {
                     setVideos(response.data.data.docs || []);
@@ -34,6 +36,18 @@ export default function MyChannel() {
             fetchMyVideos();
         }
     }, [user]);
+
+    const handleToggleVisibility = async (video) => {
+        const currentState = video.isPublished ? 'Public' : 'Hidden';
+        const oppositeState = video.isPublished ? 'Hidden' : 'Public';
+        
+        if (window.confirm(`Your video is currently ${currentState}, would you like to make it ${oppositeState}?`)) {
+            const newStatus = await togglePublish(video._id);
+            if (newStatus !== null) {
+                setVideos(videos.map(v => v._id === video._id ? { ...v, isPublished: newStatus } : v));
+            }
+        }
+    };
 
     if (!user) return null;
 
@@ -55,8 +69,8 @@ export default function MyChannel() {
                     )}
                 </div>
 
-                {/* Profile Info Section - Redesigned to remove overlap and add background */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6"> {/* Added margin top to separate from banner */}
+                {/* Profile Info Section */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                     <div className="bg-[#09090b] border border-zinc-800 rounded-2xl p-6 md:p-10 flex flex-col md:flex-row items-center md:items-end gap-6 mb-12 shadow-xl shadow-purple-500/5">
                         <img
                             src={user?.avatar || 'https://via.placeholder.com/150'}
@@ -100,7 +114,6 @@ export default function MyChannel() {
                             </Link>
                         </div>
 
-                        {/* Grid updated to xl:grid-cols-3 to match Home.jsx */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
                             {loading ? (
                                 Array(4).fill(0).map((_, i) => <VideoSkeleton key={i} />)
@@ -114,7 +127,7 @@ export default function MyChannel() {
                                     >
                                         <div className="relative aspect-video">
                                             <img
-                                                src={video.thumbnail} // Uses thumbnail as requested
+                                                src={video.thumbnail}
                                                 alt={video.title}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                             />
@@ -125,6 +138,14 @@ export default function MyChannel() {
                                                         <LuPencil size={20} />
                                                     </button>
                                                 </Link>
+                                                <button 
+                                                    onClick={() => handleToggleVisibility(video)}
+                                                    disabled={isToggling}
+                                                    title={video.isPublished ? "Make Hidden" : "Make Public"}
+                                                    className="p-3 bg-zinc-600 hover:bg-zinc-500 rounded-full text-white transition-transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    {video.isPublished ? <LuEye size={20} /> : <LuEyeOff size={20} />}
+                                                </button>
                                                 <button className="p-3 bg-red-600 hover:bg-red-500 rounded-full text-white transition-transform hover:scale-110">
                                                     <LuTrash2 size={20} />
                                                 </button>
