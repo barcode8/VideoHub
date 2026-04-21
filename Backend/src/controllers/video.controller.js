@@ -212,15 +212,43 @@ const getVideoById = asyncHandler(async (req, res) => {
     }
 
     //Find record in Mongo through videoId
-    const response = await Video.findById(videoId)
+    const response = await Video.aggregate([
+        {
+            $match: {
+                _id : new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from : "users",
+                localField : "owner",
+                foreignField : "_id",
+                as : "ownerDetails",
+                pipeline : [
+                    {
+                        $project:{
+                            username: 1,
+                            fullName: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields:{
+                ownerDetails: { $first: "$ownerDetails" }
+            }
+        }
+    ])
 
-    if(!response){
+    if(!response || response.length === 0){
         throw new ApiError(404, "Video could not be fetched")
     }
 
     return res
     .status(200)
-    .json(new ApiResponse(200, response, "Video fetched successfully"))
+    .json(new ApiResponse(200, response[0], "Video fetched successfully"))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
