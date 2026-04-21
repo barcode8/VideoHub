@@ -10,6 +10,7 @@ import './App.css'
 import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
 import EditVideo from './components/EditVideo/EditVideo.jsx'
+import WatchVideo from './components/WatchVideo/WatchVideo.jsx'
 import '@fontsource/roboto'; 
 import { AuthProvider } from './context/AuthContext.jsx'
 import MyChannel from './components/MyChannel/MyChannel.jsx'
@@ -30,6 +31,7 @@ const router= createBrowserRouter(
           <Route path='/upload' element={<UploadVideo/>}/>
           <Route path='/channel' element={<MyChannel/>}/>
           <Route path='/edit-video/:videoId' element={<EditVideo/>}/>
+          <Route path='/watch/:videoId' element={<WatchVideo/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>
