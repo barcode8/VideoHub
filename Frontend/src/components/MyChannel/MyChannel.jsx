@@ -8,12 +8,16 @@ import { VideoSkeleton } from '../Skeleton/VideoSkeleton.jsx';
 import { formatDuration } from '../../utils/formatTime.js';
 import Sidebar from '../Sidebar/Sidebar.jsx';
 import { useTogglePublish } from '../../hooks/Video/useTogglePublish.js';
+import { useDeleteVideo } from '../../hooks/Video/useDeleteVideo.js';
 
 export default function MyChannel() {
     const { user } = useAuth();
     const [videos, setVideos] = useState([]);
     const [loading, setLoading] = useState(true);
     const { togglePublish, isToggling } = useTogglePublish();
+    
+    // 2. Initialize the delete hook
+    const { deleteVideo, loading: isDeleting, error: deleteError } = useDeleteVideo();
 
     useEffect(() => {
         const fetchMyVideos = async () => {
@@ -45,6 +49,17 @@ export default function MyChannel() {
             const newStatus = await togglePublish(video._id);
             if (newStatus !== null) {
                 setVideos(videos.map(v => v._id === video._id ? { ...v, isPublished: newStatus } : v));
+            }
+        }
+    };
+
+    // Delete handler
+    const handleDeleteVideo = async (videoId) => {
+        if (window.confirm("Are you sure you want to delete this video? This action cannot be undone.")) {
+            const data = await deleteVideo(videoId);
+            if (data) {
+                // Remove the deleted video from the UI instantly
+                setVideos(videos.filter(v => v._id !== videoId));
             }
         }
     };
@@ -103,6 +118,13 @@ export default function MyChannel() {
 
                     <hr className="border-[#27272a] mb-12" />
 
+                    {/* Display Delete Error if it occurs */}
+                    {deleteError && (
+                        <div className="mb-6 bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm text-center">
+                            {deleteError}
+                        </div>
+                    )}
+
                     {/* Videos Section */}
                     <div className="pb-12">
                         <div className="flex items-center justify-between mb-8">
@@ -146,7 +168,13 @@ export default function MyChannel() {
                                                 >
                                                     {video.isPublished ? <LuEye size={20} /> : <LuEyeOff size={20} />}
                                                 </button>
-                                                <button className="p-3 bg-red-600 hover:bg-red-500 rounded-full text-white transition-transform hover:scale-110">
+                                                
+                                                {/* 4. Attached the delete handler and loading state here */}
+                                                <button 
+                                                    onClick={() => handleDeleteVideo(video._id)}
+                                                    disabled={isDeleting}
+                                                    className="p-3 bg-red-600 hover:bg-red-500 rounded-full text-white transition-transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
                                                     <LuTrash2 size={20} />
                                                 </button>
                                             </div>
