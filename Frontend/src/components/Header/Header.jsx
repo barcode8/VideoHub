@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; 
 import { LuSearch, LuUpload, LuX, LuMenu, LuLogOut, LuUser, LuBell, LuMonitorPlay } from "react-icons/lu";
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -11,13 +11,26 @@ export default function Header() {
     const [searchFocused, setSearchFocused] = useState(false);
 
     const { user, logout } = useAuth();
+    
+    //Initialize the navigate function
+    const navigate = useNavigate(); 
+
+    //Submit handler
+    const handleSearchSubmit = (e) => {
+        e.preventDefault(); // Stop the page from reloading
+        if (query.trim()) {
+            // Push the encoded query to the URL
+            navigate(`/search?query=${encodeURIComponent(query)}`);
+            // We don't clear the query state here because users usually like to see what they just searched for in the bar
+        }
+    };
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-zinc-800 font-roboto h-16">
             <div className="px-4 sm:px-6 lg:px-8 h-full">
                 <div className="flex items-center justify-between h-full">
 
-                    {/* 1. Left Section - Made flex-1 so it takes up equal space as the right side */}
+                    {/* 1. Left Section */}
                     <div className="flex flex-1 items-center min-w-[200px] pr-4 lg:pr-8">
                         <Link to="/" className="shrink-0">
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent cursor-pointer tracking-tight">
@@ -25,7 +38,6 @@ export default function Header() {
                             </h1>
                         </Link>
 
-                        {/* mx-auto pushes these links to the perfect center between the Logo and the Search Bar */}
                         <div className="hidden xl:flex items-center gap-6 mx-auto">
                             {['Home', 'Trending', 'Subscriptions', 'Library'].map((item) => (
                                 <a key={item} href="/" className="text-zinc-400 hover:text-pink-500 transition-colors text-sm font-medium">
@@ -35,9 +47,9 @@ export default function Header() {
                         </div>
                     </div>
 
-                    {/* 2. Search Section - Fixed width, strictly centered */}
+                    {/* 2. Search Section */}
                     <div className="hidden lg:flex justify-center w-full max-w-2xl px-4">
-                        <div className="relative w-full">
+                        <form onSubmit={handleSearchSubmit} className="relative w-full">
                             <input
                                 type="text"
                                 placeholder="Search videos..."
@@ -50,16 +62,20 @@ export default function Header() {
                                         : 'border-zinc-700'
                                     }`}
                             />
-                            <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                            {/* Make the search icon clickable to submit as well */}
+                            <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2">
+                                <LuSearch className="w-5 h-5 text-zinc-500 hover:text-white transition-colors" />
+                            </button>
+                            
                             {query && (
-                                <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-800 rounded-full text-zinc-400">
+                                <button type="button" onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-800 rounded-full text-zinc-400">
                                     <LuX size={16} />
                                 </button>
                             )}
-                        </div>
+                        </form>
                     </div>
 
-                    {/* 3. Action Section - flex-1 mirrors the left side to keep search bar mathematically centered */}
+                    {/* 3. Action Section */}
                     <div className="flex flex-1 items-center justify-end gap-3 min-w-[200px]">
                         <button className="lg:hidden p-2 hover:bg-zinc-800 rounded-full text-white">
                             <LuSearch size={20} />

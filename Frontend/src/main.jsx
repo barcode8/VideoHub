@@ -13,6 +13,7 @@ import EditVideo from './components/EditVideo/EditVideo.jsx'
 import WatchVideo from './components/WatchVideo/WatchVideo.jsx'
 import '@fontsource/roboto'; 
 import { AuthProvider } from './context/AuthContext.jsx'
+import SearchResult from './components/SearchResult/SearchResult.jsx'
 import MyChannel from './components/MyChannel/MyChannel.jsx'
 
 const router= createBrowserRouter(
@@ -32,6 +33,7 @@ const router= createBrowserRouter(
           <Route path='/channel' element={<MyChannel/>}/>
           <Route path='/edit-video/:videoId' element={<EditVideo/>}/>
           <Route path='/watch/:videoId' element={<WatchVideo/>}/>
+          <Route path='/search' element={<SearchResult/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>

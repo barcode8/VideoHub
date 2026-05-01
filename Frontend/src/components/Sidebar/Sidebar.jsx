@@ -8,7 +8,7 @@ import {
 
 export default function Sidebar() {
     const menuItems = [
-        { icon: <LuHouse size={20} />, label: "Home", active: true },
+        { icon: <LuHouse size={20} />, label: "Home"},
         { icon: <LuTrendingUp size={20} />, label: "Trending" },
         { icon: <LuSquarePlay size={20} />, label: "Subscriptions" }, 
         { divider: true },
@@ -16,7 +16,6 @@ export default function Sidebar() {
         { icon: <LuThumbsUp size={20} />, label: "Liked Videos" },
     ];
 
-    // YOU WERE MISSING THIS RETURN BLOCK:
     return (
         <aside className="hidden md:flex flex-col w-64 border-r border-zinc-800 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto bg-black p-3 gap-1">
             {menuItems.map((item, index) => (
