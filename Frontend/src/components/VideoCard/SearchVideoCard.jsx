@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { formatDuration } from '../../utils/formatTime.js';
 
 export default function SearchVideoCard({ video }) {
+    // Pre-compute the URL to handle potentially missing data gracefully
+    const channelUrl = `/channel/${video.ownerDetails?.username || ""}`;
+
     return (
         <div className="group flex flex-col md:flex-row gap-4 md:gap-6 cursor-pointer mb-6">
             
@@ -34,15 +37,23 @@ export default function SearchVideoCard({ video }) {
                 </p>
                 
                 {/* Channel Info inline with larger avatar */}
-                <div className="flex items-center gap-3 mt-4">
-                    <img 
-                        src={video.ownerDetails?.avatar || 'https://via.placeholder.com/150'} 
-                        className="h-8 w-8 rounded-full object-cover" 
-                        alt="avatar"
-                    />
-                    <p className="text-zinc-400 hover:text-white transition-colors text-sm">
+                <div className="flex items-center gap-3 mt-4 w-fit">
+                    {/* Avatar Link */}
+                    <Link to={channelUrl} className="shrink-0">
+                        <img 
+                            src={video.ownerDetails?.avatar || 'https://via.placeholder.com/150'} 
+                            className="h-8 w-8 rounded-full object-cover" 
+                            alt="avatar"
+                        />
+                    </Link>
+                    
+                    {/* Username Link */}
+                    <Link 
+                        to={channelUrl} 
+                        className="text-zinc-400 hover:text-white transition-colors text-sm"
+                    >
                         {video.ownerDetails?.username || "Unknown Channel"}
-                    </p>
+                    </Link>
                 </div>
 
                 {/* Description Snippet */}

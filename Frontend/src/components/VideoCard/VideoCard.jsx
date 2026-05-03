@@ -4,6 +4,8 @@ import { formatDuration } from '../../utils/formatTime.js';
 
 export default function VideoCard({ video, hideAvatar = false, layout = "vertical" }) {
     const isHorizontal = layout === "horizontal";
+    // Pre-compute the URL to keep JSX clean
+    const channelUrl = `/channel/${video.ownerDetails?.username || ""}`;
 
     return (
         <div className={`group flex ${isHorizontal ? 'flex-row gap-3' : 'flex-col gap-4'} cursor-pointer`}>
@@ -26,13 +28,15 @@ export default function VideoCard({ video, hideAvatar = false, layout = "vertica
             
             {/* Details */}
             <div className={`flex ${isHorizontal ? 'gap-0 px-0' : 'gap-4 px-1'}`}>
-                {/* Hide avatar if prop says so, OR if we are in horizontal mode (YouTube hides it here) */}
+                {/* Hide avatar if prop says so, OR if we are in horizontal mode */}
                 {!hideAvatar && !isHorizontal && (
-                    <img 
-                        src={video.ownerDetails?.avatar || 'https://via.placeholder.com/150'} 
-                        className="h-11 w-11 rounded-full object-cover border border-zinc-800 flex-shrink-0" 
-                        alt="avatar"
-                    />
+                    <Link to={channelUrl} className="shrink-0">
+                        <img 
+                            src={video.ownerDetails?.avatar || 'https://via.placeholder.com/150'} 
+                            className="h-11 w-11 rounded-full object-cover border border-zinc-800 flex-shrink-0" 
+                            alt="avatar"
+                        />
+                    </Link>
                 )}
                 
                 <div className="flex flex-col overflow-hidden">
@@ -41,9 +45,15 @@ export default function VideoCard({ video, hideAvatar = false, layout = "vertica
                             {video.title}
                         </h3>
                     </Link>
-                    <p className={`text-zinc-400 hover:text-white transition-colors ${isHorizontal ? 'text-xs mt-1' : 'text-sm mt-1.5'}`}>
+                    
+                    {/* Username Link */}
+                    <Link 
+                        to={channelUrl}
+                        className={`text-zinc-400 hover:text-white transition-colors block w-fit ${isHorizontal ? 'text-xs mt-1' : 'text-sm mt-1.5'}`}
+                    >
                         {video.ownerDetails?.username || "Unknown Channel"}
-                    </p>
+                    </Link>
+                    
                     <p className={`text-zinc-500 ${isHorizontal ? 'text-[11px] mt-0.5' : 'text-sm'}`}>
                         {video.views || 0} views • {new Date(video.createdAt).toLocaleDateString()}
                     </p>
