@@ -129,11 +129,7 @@ const publishVideoDraft = asyncHandler(async (req, res) => {
     if (!videoLocalPath) {
         throw new ApiError(400, "Video files are required")
     }
-
-    // if (!thumbnailLocalPath) {
-    //     throw new ApiError(400, "Thumbnail files are required")
-    // }
-    // 1. Create a "processing" placeholder in the database
+    
     const video = await Video.create({
         _id : videoId,
         title,
