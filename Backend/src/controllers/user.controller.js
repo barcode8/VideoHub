@@ -307,7 +307,7 @@ const changeUserCoverImage= asyncHandler(async (req,res)=>{
 })
 
 const getUserProfile= asyncHandler(async (req,res)=>{
-    const username= req.params
+    const {username}= req.params
 
     if(!username?.trim()){
         throw new ApiError(401, "Username not found")
@@ -344,7 +344,7 @@ const getUserProfile= asyncHandler(async (req,res)=>{
             },
             isSubscribed:{
                 $cond: {
-                    if: {$in: [req.user?._id, "$subscribers, subscriber"]},
+                    if: {$in: [req.user?._id, "$subscribers.subscriber"]},
                     then: true,
                     else: false
                 }
