@@ -5,15 +5,16 @@ import {
     LuHistory, 
     LuThumbsUp 
 } from "react-icons/lu";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
     const menuItems = [
-        { icon: <LuHouse size={20} />, label: "Home"},
-        { icon: <LuTrendingUp size={20} />, label: "Trending" },
-        { icon: <LuSquarePlay size={20} />, label: "Subscriptions" }, 
+        { icon: <LuHouse size={20} />, label: "Home", path: "/"},
+        { icon: <LuTrendingUp size={20} />, label: "Trending", path: "/trending" }, // Added missing paths
+        { icon: <LuSquarePlay size={20} />, label: "Subscriptions", path: "/subscriptions" }, 
         { divider: true },
-        { icon: <LuHistory size={20} />, label: "History" },
-        { icon: <LuThumbsUp size={20} />, label: "Liked Videos" },
+        { icon: <LuHistory size={20} />, label: "History", path: "/watch-history" }, // Added leading slash
+        { icon: <LuThumbsUp size={20} />, label: "Liked Videos", path: "/liked-videos" },
     ];
 
     return (
@@ -22,17 +23,19 @@ export default function Sidebar() {
                 item.divider ? (
                     <hr key={index} className="my-2 border-zinc-800" />
                 ) : (
-                    <button
+                    /* 👇 Changed button to NavLink */
+                    <NavLink
                         key={item.label}
-                        className={`flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
-                            item.active 
+                        to={item.path || "#"}
+                        className={({ isActive }) => `flex items-center gap-4 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                            isActive 
                             ? 'bg-zinc-800 text-white' 
                             : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
                         }`}
                     >
                         {item.icon}
                         {item.label}
-                    </button>
+                    </NavLink>
                 )
             ))}
         </aside>
