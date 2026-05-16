@@ -3,14 +3,34 @@ import { useParams, Link } from 'react-router-dom';
 import { LuThumbsUp, LuThumbsDown, LuShare2 } from 'react-icons/lu';
 import { useWatchVideo } from '../../hooks/Video/useWatchVideo.js';
 import VideoCard from '../VideoCard/VideoCard.jsx';
+import { useLikeVideos } from '../../hooks/Likes/useLikeVideo.js';
 
 export default function WatchVideo() {
     const { videoId } = useParams();
 
-    // Unpack our state from the custom hook
-    const { video, recommendedVideos, loading, error } = useWatchVideo(videoId);
+    // 1. We can now cleanly unpack setVideo directly from our fixed hook!
+    const { video, setVideo, recommendedVideos, loading, error } = useWatchVideo(videoId);
+    const { toggleVideoLike, isToggling, toggleError } = useLikeVideos();
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+    // 2. Click handler to toggle likes cleanly on the source data
+    const handleLikeToggle = async (e) => {
+        e.stopPropagation(); 
+        if (!video?._id || isToggling) return;
+
+        // Fire off the backend API call
+        const resultData = await toggleVideoLike(video._id);
+        
+        // If the backend toggles successfully, update the hook's central state instantly
+        if (resultData) {
+            setVideo(prev => ({
+                ...prev,
+                isLiked: !prev.isLiked,
+                likesCount: prev.isLiked ? prev.likesCount - 1 : prev.likesCount + 1
+            }));
+        }
+    };
 
     // Robust owner extraction safely wrapped to prevent crashes when video is null during loading
     const ownerData = video ? (
@@ -29,7 +49,6 @@ export default function WatchVideo() {
             {loading ? (
                 // --- SKELETON LOADER STATE ---
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 w-full max-w-[1700px] mx-auto justify-between animate-pulse">
-                    
                     {/* LEFT COLUMN SKELETON */}
                     <div className="flex-1 min-w-0 max-w-[1280px]">
                         <div className="w-full rounded-xl bg-zinc-900 aspect-video"></div>
@@ -49,7 +68,6 @@ export default function WatchVideo() {
                                 <div className="w-24 h-10 rounded-full bg-zinc-900"></div>
                             </div>
                         </div>
-                        
                         <div className="mt-6 bg-zinc-900 rounded-xl h-24 w-full"></div>
                     </div>
 
@@ -122,19 +140,29 @@ export default function WatchVideo() {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-                                <div className="flex bg-zinc-900 rounded-full items-center text-sm font-medium">
-                                    <button className={`flex items-center gap-2 px-4 py-2 hover:bg-zinc-800 rounded-l-full transition-colors border-r border-zinc-700 ${video.isLiked ? 'text-pink-500' : 'text-white'}`}>
-                                        <LuThumbsUp size={18} fill={video.isLiked ? "currentColor" : "none"} />
-                                        {video.likesCount || 0}
-                                    </button>
-                                    <button className="flex items-center px-4 py-2 hover:bg-zinc-800 rounded-r-full transition-colors text-white">
-                                        <LuThumbsDown size={18} />
+                            <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
+                                    <div className="flex bg-zinc-900 rounded-full items-center text-sm font-medium">
+                                        <button 
+                                            onClick={handleLikeToggle}
+                                            disabled={isToggling}
+                                            className={`flex items-center gap-2 px-4 py-2 hover:bg-zinc-800 rounded-l-full transition-colors border-r border-zinc-700 ${video.isLiked ? 'text-pink-500' : 'text-white'} ${isToggling ? 'opacity-80' : ''}`}
+                                        >
+                                            <LuThumbsUp size={18} fill={video.isLiked ? "currentColor" : "none"} />
+                                            {/* Reads count directly from video object */}
+                                            {video.likesCount || 0}
+                                        </button>
+                                        <button className="flex items-center px-4 py-2 hover:bg-zinc-800 rounded-r-full transition-colors text-white">
+                                            <LuThumbsDown size={18} />
+                                        </button>
+                                    </div>
+                                    <button className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-full font-medium transition-colors text-sm whitespace-nowrap">
+                                        <LuShare2 size={18} /> Share
                                     </button>
                                 </div>
-                                <button className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-full font-medium transition-colors text-sm whitespace-nowrap">
-                                    <LuShare2 size={18} /> Share
-                                </button>
+                                {toggleError && (
+                                    <span className="text-xs text-red-500 font-medium px-2">{toggleError}</span>
+                                )}
                             </div>
                         </div>
 

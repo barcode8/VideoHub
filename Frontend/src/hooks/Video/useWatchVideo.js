@@ -46,5 +46,5 @@ export const useWatchVideo = (videoId)=>{
         fetchVideoData()
     },[videoId]) // Re-run if the videoId changes (e.g., clicking a recommended video)
 
-    return {video, recommendedVideos, loading, error}
+    return {video, setVideo, recommendedVideos, loading, error}
 }
