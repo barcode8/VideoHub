@@ -13,6 +13,7 @@ import EditVideo from './components/EditVideo/EditVideo.jsx'
 import WatchVideo from './components/WatchVideo/WatchVideo.jsx'
 import UserProfile from './components/UserProfile/UserProfile.jsx'
 import WatchHistory from './components/WatchHistory/WatchHistory.jsx'
+import LikedVideos from './components/LikedVideos/LikedVideos.jsx'
 import '@fontsource/roboto'; 
 import { AuthProvider } from './context/AuthContext.jsx'
 import SearchResult from './components/SearchResult/SearchResult.jsx'
@@ -38,6 +39,7 @@ const router= createBrowserRouter(
           <Route path='/search' element={<SearchResult/>}/>
           <Route path='/channel/:username' element={<UserProfile/>}/>
           <Route path='/watch-history' element={<WatchHistory/>}/>
+          <Route path='/liked-videos' element={<LikedVideos/>}/>
           {/* This is the home component i.e. the component that will load by default when we are at the / path */}
           <Route index element={<Home />}/>
         </Route>

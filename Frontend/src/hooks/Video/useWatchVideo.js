@@ -16,7 +16,7 @@ export const useWatchVideo = (videoId)=>{
 
             //Searching for the main video
             try {
-                const videoRes = await axios.get(`http://localhost:5000/api/v1/videos/${videoId}`,{},{
+                const videoRes = await axios.get(`http://localhost:5000/api/v1/videos/${videoId}`,{
                     withCredentials: true
                 })
 
