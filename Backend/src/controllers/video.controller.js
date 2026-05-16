@@ -232,8 +232,32 @@ const getVideoById = asyncHandler(async (req, res) => {
             }
         },
         {
-            $addFields:{
-                ownerDetails: { $first: "$ownerDetails" }
+            $lookup:{
+                from : "likes",
+                localField : "_id",
+                foreignField : "video",
+                as : "likes"
+            }
+        },
+        {
+            $addFields : {
+                ownerDetails : { $first: "$ownerDetails" },
+                //Counting the number of elements in the likes array
+                likesCount : {$size : "$likes"},
+                //Checks if the logged in user has liked the video or not
+                isLiked : {
+                    $cond:{
+                        if : {$in : [req.user?._id, "$likes.likedBy"]},
+                        then : true,
+                        else : false
+                    }
+                }
+            }
+        },
+        {
+            //Removing the big Likes array from the final response
+            $project : {
+                likes : 0
             }
         }
     ])

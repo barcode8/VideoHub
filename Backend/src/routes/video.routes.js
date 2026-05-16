@@ -15,7 +15,7 @@ const router = Router();
 
 // Public routes (No verifyJwt here)
 router.route("/").get(verifyJWTIfAvailable, getAllVideos);
-router.route("/:videoId").get(getVideoById); 
+router.route("/:videoId").get(verifyJWTIfAvailable, getVideoById); 
 
 // Protected routes (Add verifyJwt as a middleware argument)
 router.route("/init").post(verifyJwt, initVideoUpload);
