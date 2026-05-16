@@ -9,10 +9,10 @@ export const useWatchHistory = ()=>{
     useEffect(()=>{
         const fetchWatchHistory = async ()=>{
             setLoading(true)
-            setError(true)
+            setError(null)
 
             try {
-                const response = axios.get("http://localhost:5000/api/v1/users/watch-history",{
+                const response = await axios.get("http://localhost:5000/api/v1/users/watch-history",{
                     withCredentials : true
                 })
                 setWatchHistory(response.data.data)
