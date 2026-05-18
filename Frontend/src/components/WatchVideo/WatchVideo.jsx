@@ -4,25 +4,46 @@ import { LuThumbsUp, LuThumbsDown, LuShare2 } from 'react-icons/lu';
 import { useWatchVideo } from '../../hooks/Video/useWatchVideo.js';
 import VideoCard from '../VideoCard/VideoCard.jsx';
 import { useLikeVideos } from '../../hooks/Likes/useLikeVideo.js';
+import CommentCard from '../CommentCard/CommentCard.jsx';
+import { useGetAllComments } from '../../hooks/Comments/useGetAllComments.js';
+import CommentSkeleton from '../Skeleton/CommentSkeleton.jsx';
+import { useAddComment } from '../../hooks/Comments/useAddComment.js';
+// 1. Import AuthContext
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function WatchVideo() {
     const { videoId } = useParams();
 
-    // 1. We can now cleanly unpack setVideo directly from our fixed hook!
+    // 2. Extract logged-in user from Auth Context
+    const { user } = useAuth();
+
     const { video, setVideo, recommendedVideos, loading, error } = useWatchVideo(videoId);
     const { toggleVideoLike, isToggling, toggleError } = useLikeVideos();
 
+    const { 
+        comments, 
+        setComments, 
+        loading: commentsLoading, 
+        error: commentsError 
+    } = useGetAllComments(videoId);
+
+    const {
+        content: newCommentContent,
+        handleChange: handleCommentChange,
+        handleSubmit: handleCommentSubmit,
+        loading: isAddingComment,
+        error: addCommentError,
+        success: addCommentSuccess
+    } = useAddComment();
+
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-    // 2. Click handler to toggle likes cleanly on the source data
     const handleLikeToggle = async (e) => {
         e.stopPropagation(); 
         if (!video?._id || isToggling) return;
 
-        // Fire off the backend API call
         const resultData = await toggleVideoLike(video._id);
         
-        // If the backend toggles successfully, update the hook's central state instantly
         if (resultData) {
             setVideo(prev => ({
                 ...prev,
@@ -32,7 +53,6 @@ export default function WatchVideo() {
         }
     };
 
-    // Robust owner extraction safely wrapped to prevent crashes when video is null during loading
     const ownerData = video ? (
         Array.isArray(video.ownerDetails) ? video.ownerDetails[0] :
         video.ownerDetails ||
@@ -53,7 +73,6 @@ export default function WatchVideo() {
                     <div className="flex-1 min-w-0 max-w-[1280px]">
                         <div className="w-full rounded-xl bg-zinc-900 aspect-video"></div>
                         <div className="h-8 bg-zinc-900 rounded w-3/4 mt-6"></div>
-                        
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-6 gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-zinc-900"></div>
@@ -70,8 +89,7 @@ export default function WatchVideo() {
                         </div>
                         <div className="mt-6 bg-zinc-900 rounded-xl h-24 w-full"></div>
                     </div>
-
-                    {/* RIGHT COLUMN SKELETON (Up Next) */}
+                    {/* RIGHT COLUMN SKELETON */}
                     <div className="w-full lg:w-[350px] xl:w-[400px] shrink-0 flex flex-col gap-4 pb-12">
                         <div className="h-6 bg-zinc-900 rounded w-24 mb-2"></div>
                         <div className="flex flex-col gap-3">
@@ -101,36 +119,21 @@ export default function WatchVideo() {
                     {/* LEFT COLUMN: Main Video & Details */}
                     <div className="flex-1 min-w-0 max-w-[1280px]">
                         <div className="relative w-full rounded-xl overflow-hidden bg-zinc-900 aspect-video">
-                            <video
-                                src={video.videoFile}
-                                poster={video.thumbnail}
-                                controls
-                                autoPlay
-                                className="w-full h-full object-contain"
-                            >
+                            <video src={video.videoFile} poster={video.thumbnail} controls autoPlay className="w-full h-full object-contain">
                                 Your browser does not support the video tag.
                             </video>
                         </div>
 
-                        <h1 className="text-xl md:text-2xl font-bold text-white mt-4 line-clamp-2">
-                            {video.title}
-                        </h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-white mt-4 line-clamp-2">{video.title}</h1>
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 gap-4">
-                            {/* Channel Info */}
                             <div className="flex items-center gap-4">
                                 <Link to={`/channel/${channelUsername}`}>
-                                    <img
-                                        src={avatarUrl}
-                                        alt={channelUsername}
-                                        className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover bg-zinc-800"
-                                    />
+                                    <img src={avatarUrl} alt={channelUsername} className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover bg-zinc-800" />
                                 </Link>
                                 <div>
                                     <Link to={`/channel/${channelUsername}`}>
-                                        <h3 className="text-white font-bold text-sm md:text-base hover:text-pink-500 transition-colors">
-                                            {channelName}
-                                        </h3>
+                                        <h3 className="text-white font-bold text-sm md:text-base hover:text-pink-500 transition-colors">{channelName}</h3>
                                     </Link>
                                     <p className="text-zinc-400 text-xs md:text-sm">1.2K subscribers</p>
                                 </div>
@@ -139,17 +142,11 @@ export default function WatchVideo() {
                                 </button>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="flex flex-col items-end gap-1">
                                 <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
                                     <div className="flex bg-zinc-900 rounded-full items-center text-sm font-medium">
-                                        <button 
-                                            onClick={handleLikeToggle}
-                                            disabled={isToggling}
-                                            className={`flex items-center gap-2 px-4 py-2 hover:bg-zinc-800 rounded-l-full transition-colors border-r border-zinc-700 ${video.isLiked ? 'text-pink-500' : 'text-white'} ${isToggling ? 'opacity-80' : ''}`}
-                                        >
+                                        <button onClick={handleLikeToggle} disabled={isToggling} className={`flex items-center gap-2 px-4 py-2 hover:bg-zinc-800 rounded-l-full transition-colors border-r border-zinc-700 ${video.isLiked ? 'text-pink-500' : 'text-white'} ${isToggling ? 'opacity-80' : ''}`}>
                                             <LuThumbsUp size={18} fill={video.isLiked ? "currentColor" : "none"} />
-                                            {/* Reads count directly from video object */}
                                             {video.likesCount || 0}
                                         </button>
                                         <button className="flex items-center px-4 py-2 hover:bg-zinc-800 rounded-r-full transition-colors text-white">
@@ -160,17 +157,11 @@ export default function WatchVideo() {
                                         <LuShare2 size={18} /> Share
                                     </button>
                                 </div>
-                                {toggleError && (
-                                    <span className="text-xs text-red-500 font-medium px-2">{toggleError}</span>
-                                )}
+                                {toggleError && <span className="text-xs text-red-500 font-medium px-2">{toggleError}</span>}
                             </div>
                         </div>
 
-                        {/* Description Box */}
-                        <div
-                            className={`mt-6 bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl p-4 cursor-pointer text-sm ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}
-                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        >
+                        <div onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className={`mt-6 bg-zinc-900 hover:bg-zinc-800 transition-colors rounded-xl p-4 cursor-pointer text-sm ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
                             <div className="font-bold text-white mb-2">
                                 {video.views || 0} views • {video.createdAt ? new Date(video.createdAt).toLocaleDateString() : ''}
                             </div>
@@ -178,6 +169,80 @@ export default function WatchVideo() {
                                 {video.description || "No description provided."}
                             </p>
                         </div>
+
+                        {/* --- COMMENTS SECTION --- */}
+                        <div className="mt-8 pt-6 border-t border-zinc-800">
+                            <h2 className="text-xl font-bold text-white mb-6">
+                                {comments?.length || 0} Comments
+                            </h2>
+                            
+                            {/* --- ADD COMMENT FORM --- */}
+                            <form 
+                                onSubmit={(e) => handleCommentSubmit(e, videoId)} 
+                                className="flex gap-4 mb-8 items-start"
+                            >
+                                {/* 3. Logged-In User's Real Avatar from AuthContext */}
+                                <img 
+                                    src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.username || 'U'}&background=random`} 
+                                    alt={user?.username || "My Avatar"} 
+                                    className="w-10 h-10 rounded-full object-cover border border-zinc-700 bg-zinc-800 shrink-0 mt-1"
+                                />
+                                <div className="flex flex-col w-full gap-2">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Add a comment..." 
+                                        value={newCommentContent}
+                                        onChange={handleCommentChange}
+                                        disabled={isAddingComment}
+                                        // 4. Bigger font (text-base) and more padding (py-2)
+                                        className="w-full bg-transparent border-b border-zinc-700 focus:border-white outline-none py-2 text-white text-base transition-colors disabled:opacity-50"
+                                    />
+                                    
+                                    {/* Show buttons only if user starts typing */}
+                                    {newCommentContent.trim().length > 0 && (
+                                        <div className="flex justify-end gap-2 mt-2">
+                                            <button 
+                                                type="submit" 
+                                                disabled={isAddingComment}
+                                                // 5. Updated Gradient Aesthetic with precise disabled states
+                                                className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:from-zinc-700 disabled:to-zinc-700 disabled:text-zinc-400 disabled:shadow-none text-white font-bold py-1.5 px-5 rounded-full text-sm transition-all shadow-[0_0_10px_rgba(147,51,234,0.2)]"
+                                            >
+                                                {isAddingComment ? "Posting..." : "Comment"}
+                                            </button>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Form Feedback */}
+                                    {addCommentError && <p className="text-red-500 text-xs mt-1">{addCommentError}</p>}
+                                </div>
+                            </form>
+                            {/* --- END ADD COMMENT FORM --- */}
+                            
+                            {/* Comments List Rendering */}
+                            {commentsLoading ? (
+                                <div className="flex flex-col gap-4">
+                                    {[...Array(5)].map((_, index) => (
+                                        <CommentSkeleton key={index} />
+                                    ))}
+                                </div>
+                            ) : commentsError ? (
+                                <div className="text-red-500 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                    {commentsError}
+                                </div>
+                            ) : comments?.length > 0 ? (
+                                <div className="flex flex-col gap-4">
+                                    {comments.map(comment => (
+                                        <CommentCard key={comment._id} comment={comment} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-zinc-400 text-sm italic bg-zinc-900/50 p-4 rounded-lg text-center">
+                                    No comments yet. Be the first to share your thoughts!
+                                </div>
+                            )}
+                        </div>
+                        {/* END COMMENTS SECTION */}
+
                     </div>
 
                     {/* RIGHT COLUMN: Recommended Videos */}
@@ -185,12 +250,7 @@ export default function WatchVideo() {
                         <h3 className="text-white font-bold text-lg mb-2">Up Next</h3>
                         <div className="flex flex-col gap-3">
                             {recommendedVideos?.map((recVideo) => (
-                                <VideoCard
-                                    key={recVideo._id}
-                                    video={recVideo}
-                                    hideAvatar={true}
-                                    layout="horizontal"
-                                />
+                                <VideoCard key={recVideo._id} video={recVideo} hideAvatar={true} layout="horizontal" />
                             ))}
                         </div>
                     </div>

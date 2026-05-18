@@ -18,7 +18,7 @@ export const useDeleteVideo = ()=>{
         return response.data
 
         } catch (err) {
-            console.log(err)
+            console.error(err)
             setError(err.response?.data?.message || "Failed to delete video");
             return null;
 
