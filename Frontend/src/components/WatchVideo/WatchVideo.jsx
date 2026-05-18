@@ -8,13 +8,11 @@ import CommentCard from '../CommentCard/CommentCard.jsx';
 import { useGetAllComments } from '../../hooks/Comments/useGetAllComments.js';
 import CommentSkeleton from '../Skeleton/CommentSkeleton.jsx';
 import { useAddComment } from '../../hooks/Comments/useAddComment.js';
-// 1. Import AuthContext
 import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function WatchVideo() {
     const { videoId } = useParams();
 
-    // 2. Extract logged-in user from Auth Context
     const { user } = useAuth();
 
     const { video, setVideo, recommendedVideos, loading, error } = useWatchVideo(videoId);
@@ -65,11 +63,10 @@ export default function WatchVideo() {
     const channelUsername = ownerData?.username || "unknown";
 
     return (
-        <div className="bg-black min-h-screen pt-20 px-4 sm:px-6 lg:px-10 xl:px-16 font-roboto">
+        <div className="bg-black min-h-screen pt-20 pb-15 px-4 sm:px-6 lg:px-10 xl:px-16 font-roboto">
             {loading ? (
-                // --- SKELETON LOADER STATE ---
+                // SKELETON LOADER STATE 
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 w-full max-w-[1700px] mx-auto justify-between animate-pulse">
-                    {/* LEFT COLUMN SKELETON */}
                     <div className="flex-1 min-w-0 max-w-[1280px]">
                         <div className="w-full rounded-xl bg-zinc-900 aspect-video"></div>
                         <div className="h-8 bg-zinc-900 rounded w-3/4 mt-6"></div>
@@ -89,7 +86,6 @@ export default function WatchVideo() {
                         </div>
                         <div className="mt-6 bg-zinc-900 rounded-xl h-24 w-full"></div>
                     </div>
-                    {/* RIGHT COLUMN SKELETON */}
                     <div className="w-full lg:w-[350px] xl:w-[400px] shrink-0 flex flex-col gap-4 pb-12">
                         <div className="h-6 bg-zinc-900 rounded w-24 mb-2"></div>
                         <div className="flex flex-col gap-3">
@@ -107,16 +103,15 @@ export default function WatchVideo() {
                     </div>
                 </div>
             ) : error || !video ? (
-                // --- ERROR / NOT FOUND STATE ---
+                // ERROR / NOT FOUND STATE
                 <div className="flex flex-col items-center justify-center h-[50vh] text-white">
                     <p className="text-xl text-red-500 mb-4">{error || "Video not found"}</p>
                     <Link to="/" className="text-purple-400 hover:text-purple-300 underline">Return Home</Link>
                 </div>
             ) : (
-                // --- SUCCESS STATE: MAIN CONTENT ---
+                // SUCCESS STATE: MAIN CONTENT 
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 w-full max-w-[1700px] mx-auto justify-between">
                     
-                    {/* LEFT COLUMN: Main Video & Details */}
                     <div className="flex-1 min-w-0 max-w-[1280px]">
                         <div className="relative w-full rounded-xl overflow-hidden bg-zinc-900 aspect-video">
                             <video src={video.videoFile} poster={video.thumbnail} controls autoPlay className="w-full h-full object-contain">
@@ -170,18 +165,16 @@ export default function WatchVideo() {
                             </p>
                         </div>
 
-                        {/* --- COMMENTS SECTION --- */}
+                        {/* COMMENTS SECTION */}
                         <div className="mt-8 pt-6 border-t border-zinc-800">
                             <h2 className="text-xl font-bold text-white mb-6">
                                 {comments?.length || 0} Comments
                             </h2>
                             
-                            {/* --- ADD COMMENT FORM --- */}
                             <form 
                                 onSubmit={(e) => handleCommentSubmit(e, videoId)} 
                                 className="flex gap-4 mb-8 items-start"
                             >
-                                {/* 3. Logged-In User's Real Avatar from AuthContext */}
                                 <img 
                                     src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.username || 'U'}&background=random`} 
                                     alt={user?.username || "My Avatar"} 
@@ -194,17 +187,14 @@ export default function WatchVideo() {
                                         value={newCommentContent}
                                         onChange={handleCommentChange}
                                         disabled={isAddingComment}
-                                        // 4. Bigger font (text-base) and more padding (py-2)
                                         className="w-full bg-transparent border-b border-zinc-700 focus:border-white outline-none py-2 text-white text-base transition-colors disabled:opacity-50"
                                     />
                                     
-                                    {/* Show buttons only if user starts typing */}
                                     {newCommentContent.trim().length > 0 && (
                                         <div className="flex justify-end gap-2 mt-2">
                                             <button 
                                                 type="submit" 
                                                 disabled={isAddingComment}
-                                                // 5. Updated Gradient Aesthetic with precise disabled states
                                                 className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 disabled:from-zinc-700 disabled:to-zinc-700 disabled:text-zinc-400 disabled:shadow-none text-white font-bold py-1.5 px-5 rounded-full text-sm transition-all shadow-[0_0_10px_rgba(147,51,234,0.2)]"
                                             >
                                                 {isAddingComment ? "Posting..." : "Comment"}
@@ -212,11 +202,9 @@ export default function WatchVideo() {
                                         </div>
                                     )}
                                     
-                                    {/* Form Feedback */}
                                     {addCommentError && <p className="text-red-500 text-xs mt-1">{addCommentError}</p>}
                                 </div>
                             </form>
-                            {/* --- END ADD COMMENT FORM --- */}
                             
                             {/* Comments List Rendering */}
                             {commentsLoading ? (
@@ -232,7 +220,14 @@ export default function WatchVideo() {
                             ) : comments?.length > 0 ? (
                                 <div className="flex flex-col gap-4">
                                     {comments.map(comment => (
-                                        <CommentCard key={comment._id} comment={comment} />
+                                        <CommentCard 
+                                            key={comment._id} 
+                                            comment={comment} 
+                                            // The vital callback keeping your UI perfectly in sync!
+                                            onCommentDeleted={(deletedId) => {
+                                                setComments(prev => prev.filter(c => c._id !== deletedId));
+                                            }}
+                                        />
                                     ))}
                                 </div>
                             ) : (
@@ -241,11 +236,8 @@ export default function WatchVideo() {
                                 </div>
                             )}
                         </div>
-                        {/* END COMMENTS SECTION */}
-
                     </div>
 
-                    {/* RIGHT COLUMN: Recommended Videos */}
                     <div className="w-full lg:w-[350px] xl:w-[400px] shrink-0 flex flex-col gap-4 pb-12">
                         <h3 className="text-white font-bold text-lg mb-2">Up Next</h3>
                         <div className="flex flex-col gap-3">
