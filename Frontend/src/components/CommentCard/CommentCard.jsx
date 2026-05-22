@@ -21,7 +21,7 @@ export default function CommentCard({ comment, onCommentDeleted }) {
     const { 
         content: editContent, 
         setContent: setEditContent, 
-        handleSubmit: handleUpdate, // <-- Matches your hook's export name exactly
+        handleSubmit: handleUpdate, 
         loading: isUpdating 
     } = useUpdateComment(comment.content);
 
