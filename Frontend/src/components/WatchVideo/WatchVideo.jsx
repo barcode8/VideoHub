@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LuThumbsUp, LuThumbsDown, LuShare2 } from 'react-icons/lu';
 import { useWatchVideo } from '../../hooks/Video/useWatchVideo.js';
@@ -9,14 +9,14 @@ import { useGetAllComments } from '../../hooks/Comments/useGetAllComments.js';
 import CommentSkeleton from '../Skeleton/CommentSkeleton.jsx';
 import { useAddComment } from '../../hooks/Comments/useAddComment.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useToggleSubscription } from '../../hooks/Subscription/useToggleSubscription.js';
 
 export default function WatchVideo() {
     const { videoId } = useParams();
-
     const { user } = useAuth();
-
     const { video, setVideo, recommendedVideos, loading, error } = useWatchVideo(videoId);
     const { toggleVideoLike, isToggling, toggleError } = useLikeVideos();
+    const { toggleSubscription, isToggling: isSubscribing, toggleError: subscriptionError } = useToggleSubscription();
 
     const { 
         comments, 
@@ -30,12 +30,32 @@ export default function WatchVideo() {
         handleChange: handleCommentChange,
         handleSubmit: handleCommentSubmit,
         loading: isAddingComment,
-        error: addCommentError,
-        success: addCommentSuccess
+        error: addCommentError
     } = useAddComment();
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
+    // --- LOCAL STATE OVERRIDES FOR OPTIMISTIC UI (Subscriptions) ---
+    const [localIsSubscribed, setLocalIsSubscribed] = useState(false);
+    const [localSubCount, setLocalSubCount] = useState(0);
+
+    // Extracting owner details safely
+    const ownerData = video ? (
+        Array.isArray(video.ownerDetails) ? video.ownerDetails[0] :
+        video.ownerDetails ||
+        (typeof video.owner === 'object' ? video.owner : null) ||
+        {}
+    ) : {};
+
+    // Sync local state when the video API finishes loading
+    useEffect(() => {
+        if (ownerData) {
+            setLocalIsSubscribed(ownerData.isSubscribed || false);
+            setLocalSubCount(ownerData.subscribersCount || 0);
+        }
+    }, [video]); // Depend on video object so it runs when video data arrives
+
+    // Handlers
     const handleLikeToggle = async (e) => {
         e.stopPropagation(); 
         if (!video?._id || isToggling) return;
@@ -51,12 +71,16 @@ export default function WatchVideo() {
         }
     };
 
-    const ownerData = video ? (
-        Array.isArray(video.ownerDetails) ? video.ownerDetails[0] :
-        video.ownerDetails ||
-        (typeof video.owner === 'object' ? video.owner : null) ||
-        {}
-    ) : {};
+    const handleSubscribeToggle = async () => {
+        if (!ownerData?._id) return; // Failsafe
+
+        const result = await toggleSubscription(ownerData._id);
+
+        if (result) {
+            setLocalIsSubscribed(result.isSubscribed);
+            setLocalSubCount(prev => result.isSubscribed ? prev + 1 : prev - 1);
+        }
+    };
 
     const avatarUrl = ownerData?.avatar || `https://ui-avatars.com/api/?name=${ownerData?.username || 'User'}&background=random`;
     const channelName = ownerData?.fullName || ownerData?.username || "Unknown Channel";
@@ -130,11 +154,33 @@ export default function WatchVideo() {
                                     <Link to={`/channel/${channelUsername}`}>
                                         <h3 className="text-white font-bold text-sm md:text-base hover:text-pink-500 transition-colors">{channelName}</h3>
                                     </Link>
-                                    <p className="text-zinc-400 text-xs md:text-sm">1.2K subscribers</p>
+                                    <p className="text-zinc-400 text-xs md:text-sm">{localSubCount} subscribers</p>
                                 </div>
-                                <button className="ml-2 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 px-4 py-2 rounded-full transition-all text-white font-bold text-sm shadow-[0_0_15px_rgba(147,51,234,0.3)]">
-                                    Subscribe
-                                </button>
+                                
+                                {/* Upgraded Subscription Button Block (White Style) */}
+                                <div className="flex flex-col">
+                                    <button 
+                                        onClick={handleSubscribeToggle}
+                                        disabled={isSubscribing}
+                                        className={`ml-2 w-32 py-2 rounded-full transition-all font-bold text-sm disabled:opacity-70 disabled:cursor-not-allowed group ${
+                                            localIsSubscribed 
+                                                ? "bg-zinc-800 text-white border border-zinc-700 hover:bg-red-600/90 hover:border-red-600 hover:text-white shadow-none" 
+                                                : "bg-white hover:bg-zinc-200 text-black shadow-md"
+                                        }`}
+                                    >
+                                        {isSubscribing ? (
+                                            "Wait..."
+                                        ) : localIsSubscribed ? (
+                                            <>
+                                                <span className="block group-hover:hidden">Subscribed</span>
+                                                <span className="hidden group-hover:block">Unsubscribe</span>
+                                            </>
+                                        ) : (
+                                            "Subscribe"
+                                        )}
+                                    </button>
+                                    {subscriptionError && <span className="text-red-500 text-xs mt-1 ml-4">{subscriptionError}</span>}
+                                </div>
                             </div>
 
                             <div className="flex flex-col items-end gap-1">
@@ -223,7 +269,6 @@ export default function WatchVideo() {
                                         <CommentCard 
                                             key={comment._id} 
                                             comment={comment} 
-                                            // The vital callback keeping your UI perfectly in sync!
                                             onCommentDeleted={(deletedId) => {
                                                 setComments(prev => prev.filter(c => c._id !== deletedId));
                                             }}

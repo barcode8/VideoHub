@@ -1,33 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar.jsx';
 import VideoCard from '../VideoCard/VideoCard.jsx';
 import { VideoSkeleton } from '../Skeleton/VideoSkeleton.jsx';
 import { useUserProfile } from '../../hooks/User/useUserProfile.js';
+import { useToggleSubscription } from '../../hooks/Subscription/useToggleSubscription.js';
 
 export default function UserProfile() {
     const { username } = useParams();
     
-    // Destructure all our states from the custom hook
     const { 
         loading, 
         error, 
         channel, 
-        isSubscribed, 
+        isSubscribed: initialIsSubscribed, 
         videoLoading, 
         videoError, 
         channelVideos 
     } = useUserProfile(username);
 
+    const { toggleSubscription, isToggling, toggleError } = useToggleSubscription();
+
+    // Local state overrides for optimistic UI
+    const [localIsSubscribed, setLocalIsSubscribed] = useState(false);
+    const [localSubCount, setLocalSubCount] = useState(0);
+
+    // Sync local state when the profile API finishes loading
+    useEffect(() => {
+        if (channel) {
+            setLocalIsSubscribed(initialIsSubscribed);
+            setLocalSubCount(channel.subscribersCount || 0);
+        }
+    }, [channel, initialIsSubscribed]);
+
+    // Handler for the subscribe button
+    const handleSubscribeToggle = async () => {
+        if (!channel?._id) return; // Failsafe
+
+        // Call the API via subscription hook
+        const result = await toggleSubscription(channel._id);
+
+        // If the API call was successful, it returns data. 
+        // We update our UI instantly based on the backend's confirmed state.
+        if (result) {
+            setLocalIsSubscribed(result.isSubscribed);
+            // Adjust the local subscriber count math
+            setLocalSubCount(prev => result.isSubscribed ? prev + 1 : prev - 1);
+        }
+    };
+
     return (
         <div className="flex h-screen bg-[#0f0f0f] text-white overflow-hidden">
-            {/* Sidebar fixed to the left */}
             <Sidebar />
 
-            {/* Main Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto pb-10">
-                
-                {/* 1. OVERALL PROFILE ERROR */}
                 {error && (
                     <div className="flex items-center justify-center h-full">
                         <p className="text-red-500 text-lg font-medium bg-red-500/10 px-6 py-3 rounded-lg">
@@ -36,7 +62,6 @@ export default function UserProfile() {
                     </div>
                 )}
 
-                {/* 2. PROFILE SKELETON (While fetching channel data) */}
                 {loading && (
                     <div className="w-full animate-pulse">
                         <div className="w-full h-48 md:h-72 bg-zinc-800"></div>
@@ -50,17 +75,11 @@ export default function UserProfile() {
                     </div>
                 )}
 
-                {/* 3. LOADED PROFILE DATA */}
                 {!loading && !error && channel && (
                     <div className="w-full">
-                        {/* Cover Image */}
                         <div className="w-full h-48 md:h-72 bg-zinc-800 relative">
                             {channel.coverImage ? (
-                                <img 
-                                    src={channel.coverImage} 
-                                    alt="Cover" 
-                                    className="w-full h-full object-cover" 
-                                />
+                                <img src={channel.coverImage} alt="Cover" className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-zinc-500">
                                     No Cover Image
@@ -68,7 +87,6 @@ export default function UserProfile() {
                             )}
                         </div>
 
-                        {/* Profile Info Header */}
                         <div className="max-w-7xl mx-auto px-4 md:px-8">
                             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mt-6">
                                 <img 
@@ -84,27 +102,40 @@ export default function UserProfile() {
                                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1.5 text-zinc-400 font-medium text-sm sm:text-base">
                                         <span>@{channel.username}</span>
                                         <span className="hidden sm:inline">•</span>
-                                        <span>{channel.subscribersCount || 0} subscribers</span>
+                                        <span>{localSubCount} subscribers</span>
                                         <span className="hidden sm:inline">•</span>
                                         <span>{channel.channelsSubscribedToCount || 0} subscribed</span>
                                     </div>
                                 </div>
 
-                                {/* Subscribe Button */}
-                                <div className="mt-4 sm:mt-6 shrink-0">
+                                <div className="mt-4 sm:mt-6 shrink-0 flex flex-col items-center sm:items-end">
                                     <button
-                                        className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all shadow-md ${
-                                            isSubscribed 
-                                                ? "bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700" 
+                                        onClick={handleSubscribeToggle}
+                                        disabled={isToggling}
+                                        className={`w-36 py-2.5 rounded-full font-bold text-sm transition-all shadow-md disabled:opacity-70 disabled:cursor-not-allowed group ${
+                                            localIsSubscribed 
+                                                ? "bg-zinc-800 text-white border border-zinc-700 hover:bg-red-600/90 hover:border-red-600 hover:text-white" 
                                                 : "bg-white hover:bg-zinc-200 text-black"
                                         }`}
                                     >
-                                        {isSubscribed ? "Subscribed" : "Subscribe"}
+                                        {isToggling ? (
+                                            "Wait..."
+                                        ) : localIsSubscribed ? (
+                                            <>
+                                                <span className="block group-hover:hidden">Subscribed</span>
+                                                <span className="hidden group-hover:block">Unsubscribe</span>
+                                            </>
+                                        ) : (
+                                            "Subscribe"
+                                        )}
                                     </button>
+                                    
+                                    {toggleError && (
+                                        <span className="text-red-500 text-xs mt-2 text-center w-full">{toggleError}</span>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Tabs */}
                             <div className="mt-8 border-b border-zinc-800">
                                 <nav className="flex gap-8 px-2">
                                     <button className="pb-3 border-b-2 border-white text-white font-medium px-1">
@@ -116,17 +147,13 @@ export default function UserProfile() {
                                 </nav>
                             </div>
 
-                            {/* 4. VIDEO GRID SECTION */}
                             <div className="mt-6">
-                                
-                                {/* Video Error State */}
                                 {videoError && (
                                     <div className="py-10 text-center text-red-400 bg-red-500/10 rounded-xl">
                                         {videoError}
                                     </div>
                                 )}
 
-                                {/* Video Loading Skeletons */}
                                 {videoLoading && !videoError && (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                                         {Array(6).fill(0).map((_, i) => (
@@ -135,22 +162,19 @@ export default function UserProfile() {
                                     </div>
                                 )}
 
-                                {/* Loaded Videos */}
                                 {!videoLoading && !videoError && channelVideos && (
                                     <>
                                         {channelVideos.length > 0 ? (
-                                            /* Exactly 3 columns on large screens */
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                                                 {channelVideos.map((video) => (
                                                     <VideoCard 
                                                         key={video._id} 
                                                         video={video} 
-                                                        hideAvatar={true} // Optional: Cleaner since we are already on their channel
+                                                        hideAvatar={true} 
                                                     />
                                                 ))}
                                             </div>
                                         ) : (
-                                            /* Empty State */
                                             <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
                                                 <svg className="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
