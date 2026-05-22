@@ -53,11 +53,7 @@ const LikedVideos = () => {
                         {likedVideos?.map((video) => (
                             <VideoCard 
                                 key={video._id} 
-                                video={{
-                                    ...video,
-                                    // Minor patch inline to fix the backend pipeline projection mismatch where duration was saved as description
-                                    duration: video.description 
-                                }} 
+                                video={video} 
                             />
                         ))}
                     </div>
