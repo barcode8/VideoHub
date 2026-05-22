@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useLikedVideos } from '../../hooks/Likes/useLikedVideos.js';
+import { useGetLikedVideos } from '../../hooks/Likes/useGetLikedVideos.js';
 import VideoCard from '../VideoCard/VideoCard.jsx'
 import { VideoSkeleton } from '../Skeleton/VideoSkeleton.jsx';
 import Sidebar from '../Sidebar/Sidebar.jsx';
 import { LuThumbsUp } from 'react-icons/lu';
 
 const LikedVideos = () => {
-    const { likedVideos, loading, error } = useLikedVideos();
+    const { likedVideos, loading, error } = useGetLikedVideos();
 
     return (
         <div className="flex min-h-screen bg-black w-full pt-20">
