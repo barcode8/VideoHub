@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LuEllipsisVertical, LuPencil, LuTrash2 } from 'react-icons/lu';
+import { LuEllipsisVertical, LuPencil, LuTrash2, LuThumbsUp } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useDeleteComment } from '../../hooks/Comments/useDeleteComment.js';
 import { useUpdateComment } from '../../hooks/Comments/useUpdateComment.js';
+import { useLikeComment } from '../../hooks/Likes/useLikeComment.js';
 
 export default function CommentCard({ comment, onCommentDeleted }) {
     // 1. Get Logged In User
@@ -16,8 +17,19 @@ export default function CommentCard({ comment, onCommentDeleted }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     
-    // Hook Implementations (Mapped EXACTLY to your export names)
+    // 3. Local state for optimistic UI updates on likes
+    const [localIsLiked, setLocalIsLiked] = useState(comment?.isLiked || false);
+    const [localLikesCount, setLocalLikesCount] = useState(comment?.likesCount || 0);
+
+    useEffect(() => {
+        setLocalIsLiked(comment?.isLiked || false);
+        setLocalLikesCount(comment?.likesCount || 0);
+    }, [comment?.isLiked, comment?.likesCount]);
+    
+    // Hook Implementations
     const { deleteComment, loading: isDeleting } = useDeleteComment();
+    const { toggleCommentLike, isToggling, toggleError } = useLikeComment();
+
     const { 
         content: editContent, 
         setContent: setEditContent, 
@@ -60,6 +72,19 @@ export default function CommentCard({ comment, onCommentDeleted }) {
             
             // 2. Shut down edit mode so it switches back to a normal text paragraph
             setIsEditing(false); 
+        }
+    };
+
+    // 4. Handler for toggling likes
+    const handleLikeToggle = async () => {
+        if (!comment?._id || isToggling) return;
+
+        const resultData = await toggleCommentLike(comment._id);
+        
+        if (resultData) {
+            // Optimistically update the UI
+            setLocalIsLiked(prev => !prev);
+            setLocalLikesCount(prev => localIsLiked ? prev - 1 : prev + 1);
         }
     };
 
@@ -148,9 +173,30 @@ export default function CommentCard({ comment, onCommentDeleted }) {
                         </div>
                     </div>
                 ) : (
-                    <p className="text-zinc-200 text-sm whitespace-pre-wrap">
-                        {comment.content}
-                    </p>
+                    <>
+                        <p className="text-zinc-200 text-sm whitespace-pre-wrap">
+                            {comment.content}
+                        </p>
+                        
+                        {/* 5. Like Button Component rendered below the text */}
+                        <div className="flex items-center gap-4 mt-2">
+                            <button 
+                                onClick={handleLikeToggle}
+                                disabled={isToggling}
+                                className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
+                                    localIsLiked ? 'text-pink-500' : 'text-zinc-400 hover:text-zinc-200'
+                                } ${isToggling ? 'opacity-50' : ''}`}
+                            >
+                                <LuThumbsUp size={14} fill={localIsLiked ? "currentColor" : "none"} />
+                                {localLikesCount > 0 ? localLikesCount : "Like"}
+                            </button>
+                            
+                            {/* Display network/API error from the hook, if any */}
+                            {toggleError && (
+                                <span className="text-red-500 text-xs">{toggleError}</span>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </div>
