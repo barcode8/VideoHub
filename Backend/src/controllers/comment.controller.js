@@ -9,6 +9,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    const userId = req.user?._id
+
     const pageNumber = parseInt(page, 10)
     const limitNumber = parseInt(limit, 10)
 
@@ -47,8 +49,34 @@ const getVideoComments = asyncHandler(async (req, res) => {
             }
         },
         {
+            $lookup : {
+                from : "likes",
+                localField : "_id",
+                foreignField : "comment",
+                as : "likes"
+            }
+        },
+        {
             $addFields:{
-                ownerDetails : { $first: "$ownerDetails" }
+                ownerDetails : { $first: "$ownerDetails" },
+                // Count the number of items in the 'likes' array
+                likesCount: { $size: "$likes" },
+                // Check if the current user's ID exists in the 'likedBy' field of the likes array
+                isLiked: {
+                    $cond: {
+                        if: {
+                            $in: [userId , "$likes.likedBy"]
+                        },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        //Remove the likes array from final output
+        {
+            $project : {
+                likes : 0
             }
         },
         {
