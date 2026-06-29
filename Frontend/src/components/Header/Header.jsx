@@ -25,6 +25,13 @@ export default function Header() {
         }
     };
 
+    // Define navigation items with their respective paths
+    const navItems = [
+        { name: 'Home', path: '/' },
+        { name: 'Subscriptions', path: '/subscriptions' },
+        { name: 'Library', path: '/library' }
+    ];
+
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-zinc-800 font-roboto h-16">
             <div className="px-4 sm:px-6 lg:px-8 h-full">
@@ -39,10 +46,15 @@ export default function Header() {
                         </Link>
 
                         <div className="hidden xl:flex items-center gap-6 mx-auto">
-                            {['Home', 'Trending', 'Subscriptions', 'Library'].map((item) => (
-                                <a key={item} href="/" className="text-zinc-400 hover:text-pink-500 transition-colors text-sm font-medium">
-                                    {item}
-                                </a>
+                            {/* Replaced <a> with <Link> and mapped over the new navItems array */}
+                            {navItems.map((item) => (
+                                <Link 
+                                    key={item.name} 
+                                    to={item.path} 
+                                    className="text-zinc-400 hover:text-pink-500 transition-colors text-sm font-medium"
+                                >
+                                    {item.name}
+                                </Link>
                             ))}
                         </div>
                     </div>
