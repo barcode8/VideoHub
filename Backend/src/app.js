@@ -39,8 +39,10 @@ import videoRouter from "./routes/video.routes.js"
 import likeRouter from "./routes/like.routes.js"
 import commentRouter from "./routes/comment.routes.js"
 import subscriptionRouter from "./routes/subscription.routes.js"
+import healthCheckRouter from "./routes/healthcheck.routes.js"
 
 //Implementing routes
+app.use("/api/v1/healthcheck", healthCheckRouter)
 app.use("/api/v1/users",userRouter)
 app.use("/api/v1/videos", videoRouter)
 app.use("/api/v1/likes", likeRouter)
