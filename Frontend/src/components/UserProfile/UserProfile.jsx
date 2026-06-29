@@ -103,8 +103,11 @@ export default function UserProfile() {
                                         <span>@{channel.username}</span>
                                         <span className="hidden sm:inline">•</span>
                                         <span>{localSubCount} subscribers</span>
+                                        
+                                        {/* COMMENTED OUT: channels subscribed to count UI
                                         <span className="hidden sm:inline">•</span>
                                         <span>{channel.channelsSubscribedToCount || 0} subscribed</span>
+                                        */}
                                     </div>
                                 </div>
 
