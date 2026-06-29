@@ -10,10 +10,10 @@ import { NavLink } from "react-router-dom";
 export default function Sidebar() {
     const menuItems = [
         { icon: <LuHouse size={20} />, label: "Home", path: "/"},
-        { icon: <LuTrendingUp size={20} />, label: "Trending", path: "/trending" }, // Added missing paths
+        // { icon: <LuTrendingUp size={20} />, label: "Trending", path: "/trending" }, 
         { icon: <LuSquarePlay size={20} />, label: "Subscriptions", path: "/subscriptions" }, 
         { divider: true },
-        { icon: <LuHistory size={20} />, label: "History", path: "/watch-history" }, // Added leading slash
+        { icon: <LuHistory size={20} />, label: "History", path: "/watch-history" }, 
         { icon: <LuThumbsUp size={20} />, label: "Liked Videos", path: "/liked-videos" },
     ];
 
