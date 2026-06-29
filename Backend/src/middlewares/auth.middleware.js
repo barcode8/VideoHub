@@ -9,7 +9,7 @@ export const verifyJwt= asyncHandler(async (req, res, next)=>{
         const token= req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
     
         if(!token){
-            throw new ApiError(401,"Unauthorized request")
+            throw new ApiError(401,"Please login first to perform this action")
         }
     
         //Here we decode the access token we checked for
@@ -28,7 +28,12 @@ export const verifyJwt= asyncHandler(async (req, res, next)=>{
         req.user=user;
         next()
     } catch (error) {
-        throw new ApiError(401, "Invalid access token")
+        // If the error is already our custom ApiError, pass it along as-is
+        if (error instanceof ApiError) {
+            throw error;
+        }
+        // Otherwise, it was likely a jwt.verify error (e.g. expired or tampered token)
+        throw new ApiError(401, "Invalid or expired access token");
     }
 })
 
