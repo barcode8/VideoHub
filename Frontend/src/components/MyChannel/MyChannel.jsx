@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -9,6 +9,18 @@ import { formatDuration } from '../../utils/formatTime.js';
 import Sidebar from '../Sidebar/Sidebar.jsx';
 import { useTogglePublish } from '../../hooks/Video/useTogglePublish.js';
 import { useDeleteVideo } from '../../hooks/Video/useDeleteVideo.js';
+import { useDashboard } from '../../hooks/Dashboard/useDashboard.js';
+
+// Framer Motion Variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function MyChannel() {
     const { user } = useAuth();
@@ -70,9 +82,14 @@ export default function MyChannel() {
         <div className="flex bg-black min-h-screen pt-20 font-roboto">
             <Sidebar />
 
-            <main className="flex-1 overflow-y-auto h-[calc(100vh-64px)] text-white">
+            <motion.main 
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex-1 overflow-y-auto h-[calc(100vh-64px)] text-white"
+            >
                 {/* Banner Section */}
-                <div className="w-full h-48 md:h-64 lg:h-80 bg-zinc-900 relative">
+                <motion.div variants={fadeUp} className="w-full h-40 md:h-56 lg:h-72 bg-zinc-900 relative">
                     {user?.coverImage ? (
                         <img
                             src={user.coverImage}
@@ -82,15 +99,15 @@ export default function MyChannel() {
                     ) : (
                         <div className="w-full h-full bg-gradient-to-r from-purple-900/30 to-pink-900/30" />
                     )}
-                </div>
+                </motion.div>
 
-                {/* Profile Info Section */}
+                {/* Profile Info Section (Flattened UI) */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-                    <div className="bg-[#09090b] border border-zinc-800 rounded-2xl p-6 md:p-10 flex flex-col md:flex-row items-center md:items-end gap-6 mb-12 shadow-xl shadow-purple-500/5">
+                    <motion.div variants={fadeUp} className="flex flex-col md:flex-row items-center md:items-center gap-6 mb-10">
                         <img
                             src={user?.avatar || 'https://via.placeholder.com/150'}
                             alt="Channel Avatar"
-                            className="w-24 h-24 md:w-36 md:h-36 rounded-full border-4 border-zinc-800 object-cover bg-zinc-900"
+                            className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-black object-cover bg-zinc-900"
                         />
                         <div className="flex-1 text-center md:text-left">
                             <h1 className="text-3xl font-bold text-white mb-1">{user?.fullName || user?.username}</h1>
@@ -99,52 +116,48 @@ export default function MyChannel() {
                                 <span>•</span>
                                 <span>{videos.length} Videos</span>
                             </div>
-                            <p className="mt-4 text-[#a1a1aa] max-w-2xl text-sm leading-relaxed">
-                                Welcome to my VidShare channel! Here you can view and manage all your uploaded content.
-                            </p>
                         </div>
-                        <div className="md:pb-2">
+                        <div className="md:pb-0">
                             <Link to="/change-details">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="bg-white text-black font-bold px-8 py-2.5 rounded-full hover:bg-zinc-200 transition-colors"
+                                    className="bg-zinc-800 text-white font-medium px-6 py-2 rounded-full hover:bg-zinc-700 transition-colors"
                                 >
                                     Customize Channel
                                 </motion.button>
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <hr className="border-[#27272a] mb-12" />
+                    <hr className="border-[#18181b] mb-10" />
 
                     {/* Display Delete Error if it occurs */}
                     {deleteError && (
-                        <div className="mb-6 bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm text-center">
+                        <motion.div variants={fadeUp} className="mb-6 bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm text-center">
                             {deleteError}
-                        </div>
+                        </motion.div>
                     )}
 
                     {/* Videos Section */}
                     <div className="pb-12">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold text-white">Manage Videos</h2>
+                        <motion.div variants={fadeUp} className="flex items-center justify-between mb-8">
+                            <h2 className="text-xl font-bold text-white">Manage Videos</h2>
                             <Link to="/upload">
                                 <button className="text-sm bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-lg text-pink-500 hover:text-pink-400 font-medium transition-colors">
                                     + Upload New Video
                                 </button>
                             </Link>
-                        </div>
+                        </motion.div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
+                        <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
                             {loading ? (
                                 Array(4).fill(0).map((_, i) => <VideoSkeleton key={i} />)
                             ) : videos.length > 0 ? (
                                 videos.map((video) => (
                                     <motion.div
                                         key={video._id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        variants={fadeUp}
                                         className="group bg-[#09090b] rounded-xl overflow-hidden border border-[#18181b] hover:border-purple-500/50 hover:shadow-[0_0_30px_rgba(147,51,234,0.1)] transition-all duration-300"
                                     >
                                         <div className="relative aspect-video">
@@ -169,7 +182,6 @@ export default function MyChannel() {
                                                     {video.isPublished ? <LuEye size={20} /> : <LuEyeOff size={20} />}
                                                 </button>
                                                 
-                                                {/* 4. Attached the delete handler and loading state here */}
                                                 <button 
                                                     onClick={() => handleDeleteVideo(video._id)}
                                                     disabled={isDeleting}
@@ -200,7 +212,7 @@ export default function MyChannel() {
                                     </motion.div>
                                 ))
                             ) : (
-                                <div className="col-span-full flex flex-col items-center justify-center py-20 bg-[#09090b] rounded-2xl border border-zinc-800 border-dashed">
+                                <motion.div variants={fadeUp} className="col-span-full flex flex-col items-center justify-center py-20 bg-[#09090b] rounded-2xl border border-zinc-800 border-dashed">
                                     <h3 className="text-xl font-bold text-white mb-2">No videos uploaded</h3>
                                     <p className="text-[#a1a1aa] mb-6 text-sm">Upload a video to start filling up your channel</p>
                                     <Link to="/upload">
@@ -208,12 +220,12 @@ export default function MyChannel() {
                                             Upload Video
                                         </button>
                                     </Link>
-                                </div>
+                                </motion.div>
                             )}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
-            </main>
+            </motion.main>
         </div>
     );
 }
