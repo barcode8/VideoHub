@@ -31,7 +31,7 @@ export const useChangeUserDetails = () => {
         try {
             if (fullName.trim() !== "") {
                 await axios.patch(
-                    "http://localhost:5000/api/v1/users/change-details",
+                    "${import.meta.env.VITE_API_BASE_URL}/api/v1/users/change-details",
                     { fullName },
                     { headers: { "Content-Type": "application/json" }, withCredentials: true }
                 );
@@ -41,7 +41,7 @@ export const useChangeUserDetails = () => {
                 const formData = new FormData();
                 formData.append("avatar", avatar);
                 await axios.patch(
-                    "http://localhost:5000/api/v1/users/change-avatar",
+                    "${import.meta.env.VITE_API_BASE_URL}/api/v1/users/change-avatar",
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
                 );
@@ -51,7 +51,7 @@ export const useChangeUserDetails = () => {
                 const formData = new FormData();
                 formData.append("coverImage", coverImage);
                 await axios.patch(
-                    "http://localhost:5000/api/v1/users/change-coverimage",
+                    "${import.meta.env.VITE_API_BASE_URL}/api/v1/users/change-coverimage",
                     formData,
                     { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
                 );

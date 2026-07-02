@@ -12,7 +12,7 @@ export const useGetSubscribedChannels = ()=>{
             setError(null)
 
             try {
-                const response = await axios.get(`http://localhost:5000/api/v1/subscriptions/my-subscriptions`,{
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/subscriptions/my-subscriptions`,{
                     withCredentials : true
                 })
                 setSubscribedChannels(response.data.data)

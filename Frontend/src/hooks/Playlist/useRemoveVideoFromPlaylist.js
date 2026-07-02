@@ -13,7 +13,7 @@ export const useRemoveVideoFromPlaylist = ()=>{
         setSuccess(false)
 
         try {
-            const res = await axios.patch(`http://localhost:5000/api/v1/playlist/remove/${videoId}/${playlistId}`,{},{
+            const res = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist/remove/${videoId}/${playlistId}`,{},{
                 withCredentials : true
             })
 

@@ -11,7 +11,7 @@ export const useLikeComment = () => {
 
         try {
             const res = await axios.post(
-                `http://localhost:5000/api/v1/likes/toggle/c/${commentId}`, 
+                `${import.meta.env.VITE_API_BASE_URL}/api/v1/likes/toggle/c/${commentId}`, 
                 {}, 
                 { withCredentials: true }
             );

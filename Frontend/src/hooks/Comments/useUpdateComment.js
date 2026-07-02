@@ -25,7 +25,7 @@ export const useUpdateComment = (initialContent = "")=>{
         setError(null);
 
         try {
-            const response = await axios.patch (`http://localhost:5000/api/v1/comments/c/${commentId}`, data, {
+            const response = await axios.patch (`${import.meta.env.VITE_API_BASE_URL}/api/v1/comments/c/${commentId}`, data, {
                 headers:{
                     "Content-Type" : "application/json"
                 },

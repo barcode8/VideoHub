@@ -34,7 +34,7 @@ export const useUpdatePlaylist = (playlistId)=>{
 
         try {
             //Sending change password request to server
-            const res = await axios.patch(`http://localhost:5000/api/v1/playlist${playlistId}`, data, {
+            const res = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist${playlistId}`, data, {
                 headers: {
                     "Content-Type": "application/json"
                 },

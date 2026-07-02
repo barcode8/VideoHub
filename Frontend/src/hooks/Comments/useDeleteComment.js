@@ -13,7 +13,7 @@ export const useDeleteComment = ()=>{
         setError(null)
 
         try {
-            const response = await axios.delete (`http://localhost:5000/api/v1/comments/c/${commentId}`, {
+            const response = await axios.delete (`${import.meta.env.VITE_API_BASE_URL}/api/v1/comments/c/${commentId}`, {
                 withCredentials : true
             })
 

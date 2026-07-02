@@ -43,7 +43,7 @@ export const useUpdateVideo = (videoId)=>{
         setLoading(true);
 
         try {
-            const res = await axios.patch(`http://localhost:5000/api/v1/videos/${videoId}`, data, {
+            const res = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/${videoId}`, data, {
                 headers:{
                     "Content-Type": "multipart/form-data",
                 },

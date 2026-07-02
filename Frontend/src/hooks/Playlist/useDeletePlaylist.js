@@ -12,7 +12,7 @@ export const useDeletePlaylist = ()=>{
         setError(null)
 
         try {
-            const response = await axios.delete (`http://localhost:5000/api/v1/playlist/${playlistId}`, {
+            const response = await axios.delete (`${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist/${playlistId}`, {
                 withCredentials : true
             })
 

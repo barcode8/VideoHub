@@ -11,7 +11,7 @@ export const useDeleteVideo = ()=>{
         try {
         setError(null);
         setLoading(true);
-        const response = await axios.delete(`http://localhost:5000/api/v1/videos/${videoId}`,{
+        const response = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/${videoId}`,{
             withCredentials: true
         })
         setSuccess(true)

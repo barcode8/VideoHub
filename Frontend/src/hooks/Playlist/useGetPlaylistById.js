@@ -12,7 +12,7 @@ export const useGetPlaylistById = ()=>{
         setLoading(true)
 
         try {
-            const res = await axios.get(`http://localhost:5000/api/v1/playlist/${playlistId}`,{
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist/${playlistId}`,{
                 withCredentials : true
             })
 

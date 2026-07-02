@@ -24,7 +24,7 @@ export const useAddComment = ()=>{
         setError(null);
 
         try {
-            const response = await axios.post (`http://localhost:5000/api/v1/comments/${videoId}`, data, {
+            const response = await axios.post (`${import.meta.env.VITE_API_BASE_URL}/api/v1/comments/${videoId}`, data, {
                 headers:{
                     "Content-Type" : "application/json"
                 },

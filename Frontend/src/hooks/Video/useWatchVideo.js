@@ -16,7 +16,7 @@ export const useWatchVideo = (videoId)=>{
 
             //Searching for the main video
             try {
-                const videoRes = await axios.get(`http://localhost:5000/api/v1/videos/${videoId}`,{
+                const videoRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/${videoId}`,{
                     withCredentials: true
                 })
 
@@ -25,7 +25,7 @@ export const useWatchVideo = (videoId)=>{
                 }
 
                 //Getting more videos for recommendation system
-                const recRes = await axios.get(`http://localhost:5000/api/v1/videos`,{}, {
+                const recRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos`,{}, {
                     withCredentials: true
                 });
 

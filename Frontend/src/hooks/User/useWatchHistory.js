@@ -12,7 +12,7 @@ export const useWatchHistory = ()=>{
             setError(null)
 
             try {
-                const response = await axios.get("http://localhost:5000/api/v1/users/watch-history",{
+                const response = await axios.get("${import.meta.env.VITE_API_BASE_URL}/api/v1/users/watch-history",{
                     withCredentials : true
                 })
                 setWatchHistory(response.data.data)

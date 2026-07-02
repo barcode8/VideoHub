@@ -39,7 +39,7 @@ export const useRegisterController = () => {
         try {
             setLoading(true)
 
-            const res = await axios.post("http://localhost:5000/api/v1/users/register", data, {
+            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/users/register", data, {
                 headers: {
                     "Content-Type": "multipart/form-data" //One part different from other use__ hooks is that here we use multipart/form-data and not application/json since as we discussed before we are using multer here
                 },

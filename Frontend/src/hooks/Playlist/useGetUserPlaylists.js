@@ -14,7 +14,7 @@ export const useGetUserPlaylists = ()=>{
         setSuccess(false)
 
         try {
-            const res = await axios.get(`http://localhost:5000/api/v1/playlist/user/${userId}`,{
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist/user/${userId}`,{
                 withCredentials : true
             })
 

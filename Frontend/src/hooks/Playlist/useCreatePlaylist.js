@@ -31,7 +31,7 @@ export const useCreatePlaylist = ()=>{
         try {
             setLoading(true)
 
-            const res = await axios.post("http://localhost:5000/api/v1/playlist", data, {
+            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/playlist", data, {
                 headers: {
                     "Content-Type": "application/json"
                 },

@@ -10,7 +10,7 @@ export const useTogglePublish = ()=>{
         setToggleError(null);
 
         try {
-            const res = await axios.patch(`http://localhost:5000/api/v1/videos/toggle/publish/${videoId}`, {},{
+            const res = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/toggle/publish/${videoId}`, {},{
                 withCredentials:true
             })
 

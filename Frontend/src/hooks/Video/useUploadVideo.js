@@ -35,7 +35,7 @@ export const useUploadVideo = ()=>{
         setVideoFile(file);
 
         try {
-            const res = await axios.post("http://localhost:5000/api/v1/videos/init",
+            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/init",
                 {},
                 {withCredentials : true}
             )
@@ -94,7 +94,7 @@ export const useUploadVideo = ()=>{
         setLoading(true);
 
         try {
-            const res = await axios.post(`http://localhost:5000/api/v1/videos/${draftId || ""}`, data, {
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/${draftId || ""}`, data, {
                 headers:{
                     "Content-Type": "multipart/form-data",
                 },

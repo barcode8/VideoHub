@@ -22,7 +22,7 @@ export const useUserProfile = (username)=>{
             setVideoError(null)
 
             try {
-                const profileResponse = await axios.get(`http://localhost:5000/api/v1/users/c/${username}`, {
+                const profileResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users/c/${username}`, {
                     withCredentials : true //Not using will cause the request to exclude the cookie, which the backend will then reject because of CORS
                 })
 
@@ -34,7 +34,7 @@ export const useUserProfile = (username)=>{
                 setLoading(false)
 
                 try {
-                    const response = await axios.get(`http://localhost:5000/api/v1/videos`, {
+                    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos`, {
                     params:{
                         userId : fetchedChannelData._id
                     },
