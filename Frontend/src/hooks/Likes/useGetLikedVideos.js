@@ -12,7 +12,7 @@ export const useGetLikedVideos = ()=>{
             setError(null)
 
             try {
-                const response = await axios.get("${import.meta.env.VITE_API_BASE_URL}/api/v1/likes/videos",{
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/likes/videos`,{
                     withCredentials : true
                 })
                 setlikedVideos(response.data.data)

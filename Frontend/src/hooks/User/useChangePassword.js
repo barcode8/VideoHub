@@ -38,7 +38,7 @@ export const useChangePassword = ()=>{
 
         try {
             //Sending change password request to server
-            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/users/change-password", data, {
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users/change-password`, data, {
                 headers: {
                     "Content-Type": "application/json"
                 },

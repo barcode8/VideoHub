@@ -35,7 +35,7 @@ export const useUploadVideo = ()=>{
         setVideoFile(file);
 
         try {
-            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/init",
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos/init`,
                 {},
                 {withCredentials : true}
             )

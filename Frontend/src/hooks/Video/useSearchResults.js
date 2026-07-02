@@ -12,7 +12,7 @@ export const useSearchResults = (query, sortBy, sortType)=>{
             setError(null)
 
             try {
-                const response = await axios.get("${import.meta.env.VITE_API_BASE_URL}/api/v1/videos",{
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/videos`,{
                     params : {
                         query : query,
                         sortBy : sortBy,

@@ -47,7 +47,7 @@ export const useLoginController = ()=>{
             setLoading(true)
 
             //Sending login request to server
-            const res = await axios.post("${import.meta.env.VITE_API_BASE_URL}/api/v1/users/login", data, {
+            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users/login`, data, {
                 headers: {
                     "Content-Type": "application/json"
                 },
